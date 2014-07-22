@@ -64,7 +64,7 @@ public class BrokerConfiguration {
     }
 
     private AWSCredentials awsCredentials() {
-        return new BasicAWSCredentials("AKIAINI4TNGJWSTZXPUA", "gEW16SxiNJiFgWiJbUWyf52omXEqWk7UjxxolyJ5");
+        return new BasicAWSCredentials("", "");
     }
 
     @Bean
