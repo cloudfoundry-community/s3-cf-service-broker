@@ -1,0 +1,40 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1406255666000",
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "arn:aws:s3:::*/*"
+      ]
+    },
+    {
+      "Sid": "Stmt1406255738000",
+      "Effect": "Allow",
+      "Action": [
+        "iam:AddUserToGroup",
+        "iam:ChangePassword",
+        "iam:CreateAccessKey",
+        "iam:CreateGroup",
+        "iam:CreateUser",
+        "iam:DeleteGroup",
+        "iam:DeleteGroupPolicy",
+        "iam:DeleteUser",
+        "iam:GetGroup",
+        "iam:GetGroupPolicy",
+        "iam:GetUser",
+        "iam:ListGroups",
+        "iam:ListGroupsForUser",
+        "iam:ListUsers",
+        "iam:UpdateGroup",
+        "iam:UpdateUser"
+      ],
+      "Resource": [
+        "arn:aws:iam::712723606201:user/service-broker-test"
+      ]
+    }
+  ]
+}
