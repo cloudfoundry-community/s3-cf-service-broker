@@ -54,6 +54,7 @@ public class S3ServiceInstanceService implements ServiceInstanceService {
     public ServiceInstance deleteServiceInstance(String id) throws ServiceBrokerException {
         ServiceInstance instance = getServiceInstance(id);
         iam.deleteGroupForInstance(id);
+        // TODO we need to delete everything in the bucket before we can delete it
         s3.deleteBucket(id);
         return instance;
     }
