@@ -48,7 +48,7 @@ public class S3 {
     public Bucket createBucketForInstance(String instanceId, ServiceDefinition service, String planId,
             String organizationGuid, String spaceGuid) {
         String bucketName = getBucketNameForInstance(instanceId);
-        logger.info("Creating bucket {} for serviceInstanceId {}", bucketName, instanceId);
+        logger.info("Creating bucket '{}' for serviceInstanceId '{}'", bucketName, instanceId);
         Bucket bucket = s3.createBucket(bucketName);
 
         // TODO additional tagging options
@@ -66,7 +66,7 @@ public class S3 {
 
     public void deleteBucket(String id) {
         String bucketName = getBucketNameForInstance(id);
-        logger.info("Deleting bucket {} for serviceInstanceId {}", bucketName, id);
+        logger.info("Deleting bucket '{}' for serviceInstanceId '{}'", bucketName, id);
         s3.deleteBucket(bucketName);
     }
 

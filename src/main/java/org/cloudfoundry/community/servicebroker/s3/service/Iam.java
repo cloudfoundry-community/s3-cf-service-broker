@@ -50,7 +50,7 @@ public class Iam {
     private String groupPath = "/cloud-foundry/s3/";
     // TODO make configurable. Can be empty
     private String groupNamePrefix = "cloud-foundry-s3-";
-    
+
     // TODO make configurable. Can be empty
     private String policyNamePrefix = "cloud-foundry-s3-";
 
@@ -67,7 +67,7 @@ public class Iam {
 
     public Group createGroupForBucket(String instanceId, String bucketName) {
         String groupName = getGroupNameForInstance(instanceId);
-        logger.info("Creating group '{}' for bucket {}", groupName, bucketName);
+        logger.info("Creating group '{}' for bucket '{}'", groupName, bucketName);
         CreateGroupRequest request = new CreateGroupRequest(groupName);
         request.setPath(groupPath);
         CreateGroupResult result = iam.createGroup(request);
@@ -83,10 +83,10 @@ public class Iam {
 
         return result.getGroup();
     }
-    
+
     public void deleteGroupForInstance(String instanceId) {
         String groupName = getGroupNameForInstance(instanceId);
-        logger.info("Deleting group '{}' for instance {}", groupName, instanceId);
+        logger.info("Deleting group '{}' for instance '{}'", groupName, instanceId);
         DeleteGroupRequest request = new DeleteGroupRequest(groupName);
         iam.deleteGroup(request);
     }
@@ -100,7 +100,9 @@ public class Iam {
     }
 
     public User createUserForBinding(String bindingId) {
-        CreateUserRequest request = new CreateUserRequest(getUserNameForBinding(bindingId)).withPath(userPath);
+        String username = getUserNameForBinding(bindingId);
+        logger.info("Creating user '{}' for service binding '{}'", username, bindingId);
+        CreateUserRequest request = new CreateUserRequest(username).withPath(userPath);
         CreateUserResult result = iam.createUser(request);
         return result.getUser();
     }
@@ -111,10 +113,13 @@ public class Iam {
 
     public void deleteUserForBinding(String bindingId) {
         // TODO must remove user from group first
-//        RemoveUserFromGroupRequest groupRequest = new RemoveUserFromGroupRequest(groupName, userName);
-//        iam.removeUserFromGroup(removeUserFromGroupRequest);
-        
-        DeleteUserRequest request = new DeleteUserRequest(getUserNameForBinding(bindingId));
+        // RemoveUserFromGroupRequest groupRequest = new
+        // RemoveUserFromGroupRequest(groupName, userName);
+        // iam.removeUserFromGroup(removeUserFromGroupRequest);
+        String username = getUserNameForBinding(bindingId);
+        logger.info("Deleting user '{}' from service binding '{}'", username, bindingId);
+
+        DeleteUserRequest request = new DeleteUserRequest(username);
         iam.deleteUser(request);
     }
 
@@ -125,6 +130,7 @@ public class Iam {
     }
 
     public void addUserToGroup(User user, String groupName) {
+        logger.info("Adding user '{}' to group '{}'", user.getUserName(), groupName);
         AddUserToGroupRequest request = new AddUserToGroupRequest();
         request.setGroupName(groupName);
         request.setUserName(user.getUserName());
