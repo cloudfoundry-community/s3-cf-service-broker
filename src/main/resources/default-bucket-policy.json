@@ -1,6 +1,12 @@
 {
   "Statement": [
     {
+      "Sid": "enableConsoleAccess",
+      "Action": ["s3:GetBucketLocation", "s3:ListAllMyBuckets"],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::*"
+    },
+    {
       "Sid": "permissionsOnBucket",
       "Action": [
         "s3:DeleteBucketWebsite",
