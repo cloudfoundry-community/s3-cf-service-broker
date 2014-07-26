@@ -19,7 +19,18 @@ mvn package && AWS_ACCESS_KEY=secret AWS_SECRET_KEY=secret java -jar target//s3-
 
 ### In Cloud Foundry
 
+## Format of Credentials
 
+The credentials provided in a bind call have the following format:
+
+```
+"credentials":{
+	"username":"cloud-foundry-s3-c5271ba4-6d2f-4163-843c-6a5fdceb7a1a",
+	"access_key_id":"secret",
+	"bucket":"cloud-foundry-2eac2d52-bfc9-4d0f-af28-c02187689d72",
+	"secret_access_key":"zKKOYUoCWnq1Frr69BHgwA0IxNpeSiMdrDW7jdy0"
+}
+```
 
 ## Broker Security
 
