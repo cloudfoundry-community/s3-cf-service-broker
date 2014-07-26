@@ -2,17 +2,18 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "Stmt1406255666000",
+      "Sid": "manageBucketsAndObjectsInBuckets",
       "Effect": "Allow",
       "Action": [
         "s3:*"
       ],
       "Resource": [
+        "arn:aws:s3:::*",
         "arn:aws:s3:::*/*"
       ]
     },
     {
-      "Sid": "Stmt1406255738000",
+      "Sid": "manageUsersForBinding",
       "Effect": "Allow",
       "Action": [
         "iam:AddUserToGroup",
@@ -20,20 +21,26 @@
         "iam:CreateAccessKey",
         "iam:CreateGroup",
         "iam:CreateUser",
+        "iam:DeleteAccessKey",
         "iam:DeleteGroup",
         "iam:DeleteGroupPolicy",
         "iam:DeleteUser",
         "iam:GetGroup",
         "iam:GetGroupPolicy",
         "iam:GetUser",
+        "iam:ListAccessKeys",
         "iam:ListGroups",
         "iam:ListGroupsForUser",
         "iam:ListUsers",
+        "iam:PutGroupPolicy",
+        "iam:RemoveUserFromGroup",
         "iam:UpdateGroup",
         "iam:UpdateUser"
       ],
       "Resource": [
-        "arn:aws:iam::712723606201:user/service-broker-test"
+        "arn:aws:iam::[your-account]:user/*",
+        "arn:aws:iam::[your-account]:group/",
+        "arn:aws:iam::[your-account]:group/*"
       ]
     }
   ]

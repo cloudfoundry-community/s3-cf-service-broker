@@ -27,6 +27,7 @@ import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.Plan;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.s3.service.BucketGroupPolicy;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +42,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
@@ -51,20 +51,15 @@ import com.google.common.io.Resources;
 @Configuration
 @ComponentScan(basePackages = "org.cloudfoundry.community.servicebroker", excludeFilters = { @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = BrokerApiVersionConfig.class) })
 public class BrokerConfiguration {
-
-    @Bean
-    public Catalog catalog() throws JsonParseException, JsonMappingException, IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        ClassPathResource resource = new ClassPathResource("catalog.json");
-        Catalog catalog = mapper.readValue(resource.getURL(), Catalog.class);
-
-        return new Catalog(Arrays.asList(new ServiceDefinition("s3", "Amazon S3",
-                "Amazon S3 is storage for the Internet.", true, getPlans())));
-        // return catalog;
-    }
+    
+    @Value("${AWS_ACCESS_KEY}")
+    private String accessKey;
+    
+    @Value("${AWS_SECRET_KEY}")
+    private String secretKey;
 
     private AWSCredentials awsCredentials() {
-        return new BasicAWSCredentials("", "");
+        return new BasicAWSCredentials(accessKey, secretKey);
     }
 
     @Bean
@@ -76,17 +71,24 @@ public class BrokerConfiguration {
     public AmazonS3 amazonS3() {
         return new AmazonS3Client(awsCredentials());
     }
-    
+
     @Bean
-    public BucketGroupPolicy bucketGroupPolicy() throws IOException{
+    public BucketGroupPolicy bucketGroupPolicy() throws IOException {
         URL url = new ClassPathResource("default-bucket-policy.json").getURL();
         String policyDocument = Resources.toString(url, Charsets.UTF_8);
         return new BucketGroupPolicy(policyDocument);
     }
 
-    private List<Plan> getPlans() {
-        return Arrays.asList(new Plan("s3-plan", "Default S3 Plan",
-                "This is a default S3 plan.  All services are created equally.", getPlanMetadata()));
+    @Bean
+    public Catalog catalog() throws JsonParseException, JsonMappingException, IOException {
+        ServiceDefinition serviceDefinition = new ServiceDefinition("s3", "amazon-s3",
+                "Amazon S3 is storage for the Internet.", true, getPlans(), getTags(), getServiceDefinitionMetadata(),
+                null, null);
+        return new Catalog(Arrays.asList(serviceDefinition));
+    }
+
+    private List<String> getTags() {
+        return Arrays.asList("s3", "object-storage");
     }
 
     private Map<String, Object> getServiceDefinitionMetadata() {
@@ -100,27 +102,19 @@ public class BrokerConfiguration {
         return sdMetadata;
     }
 
-    private Map<String, Object> getPlanMetadata() {
+    private List<Plan> getPlans() {
+        Plan basic = new Plan("s3-basic-plan", "Basic S3 Plan",
+                "An S3 plan providing a single bucket with umlimited storage.", getBasicPlanMetadata());
+        return Arrays.asList(basic);
+    }
+
+    private Map<String, Object> getBasicPlanMetadata() {
         Map<String, Object> planMetadata = new HashMap<String, Object>();
-        planMetadata.put("costs", getCosts());
-        planMetadata.put("bullets", getBullets());
+        planMetadata.put("bullets", getBasicPlanBullets());
         return planMetadata;
     }
 
-    private List<Map<String, Object>> getCosts() {
-        Map<String, Object> costsMap = new HashMap<String, Object>();
-
-        Map<String, Object> amount = new HashMap<String, Object>();
-        amount.put("usd", new Double(0.0));
-
-        costsMap.put("amount", amount);
-        costsMap.put("unit", "MONTHLY");
-
-        return Arrays.asList(costsMap);
-    }
-
-    private List<String> getBullets() {
-        return Arrays.asList("Shared MongoDB server", "100 MB Storage (not enforced)",
-                "40 concurrent connections (not enforced)");
+    private List<String> getBasicPlanBullets() {
+        return Arrays.asList("Single S3 bucket", "Unlimited storage", "Unlimited number of objects");
     }
 }

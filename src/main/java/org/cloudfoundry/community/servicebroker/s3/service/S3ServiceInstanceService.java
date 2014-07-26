@@ -47,22 +47,25 @@ public class S3ServiceInstanceService implements ServiceInstanceService {
             String organizationGuid, String spaceGuid) throws ServiceInstanceExistsException, ServiceBrokerException {
         Bucket bucket = s3.createBucketForInstance(serviceInstanceId, service, planId, organizationGuid, spaceGuid);
         iam.createGroupForBucket(serviceInstanceId, bucket.getName());
+        iam.applyGroupPolicyForBucket(serviceInstanceId, bucket.getName());
         return new ServiceInstance(serviceInstanceId, service.getId(), planId, organizationGuid, spaceGuid, null);
     }
 
     @Override
-    public ServiceInstance deleteServiceInstance(String id) throws ServiceBrokerException {
+    public ServiceInstance deleteServiceInstance(String id, String serviceId, String planId)
+            throws ServiceBrokerException {
         ServiceInstance instance = getServiceInstance(id);
+        // TODO we need to make these deletes idempotent so we can handle retries on error
+        iam.deleteGroupPolicy(id);
         iam.deleteGroupForInstance(id);
-        // TODO we need to delete everything in the bucket before we can delete it
+        s3.emptyBucket(id);
         s3.deleteBucket(id);
         return instance;
     }
 
     @Override
     public List<ServiceInstance> getAllServiceInstances() {
-        // TODO Auto-generated method stub
-        return null;
+        return s3.getAllServiceInstances();
     }
 
     @Override

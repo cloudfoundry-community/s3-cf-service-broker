@@ -50,7 +50,7 @@ public class S3ServiceInstanceBindingService implements ServiceInstanceBindingSe
             ServiceBrokerException {
         User user = iam.createUserForBinding(bindingId);
         AccessKey accessKey = iam.createAccessKey(user);
-        // TODO create password
+        // TODO create password and add to credentials
         iam.addUserToGroup(user, iam.getGroupNameForInstance(serviceInstance.getId()));
 
         Map<String, Object> credentials = new HashMap<String, Object>();
@@ -58,22 +58,21 @@ public class S3ServiceInstanceBindingService implements ServiceInstanceBindingSe
         credentials.put("username", user.getUserName());
         credentials.put("access_key_id", accessKey.getAccessKeyId());
         credentials.put("secret_access_key", accessKey.getSecretAccessKey());
-        // TODO add password (make password optional?)
         return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, null, appGuid);
     }
 
     @Override
-    public ServiceInstanceBinding deleteServiceInstanceBinding(String id) throws ServiceBrokerException {
-        iam.deleteUserForBinding(id);
-        // TODO submit pull request to have the deleteServiceInstanceBinding
-        // method signature changed so you don't have to return what you just
-        // deleted.
-        return new ServiceInstanceBinding(id, null, null, null, null);
+    public ServiceInstanceBinding deleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance,
+            String serviceId, String planId) throws ServiceBrokerException {
+        // TODO make operations idempotent so we can handle retries on error
+        iam.removeUserFromGroup(bindingId, serviceInstance.getId());
+        iam.deleteUserAccessKeys(bindingId);
+        iam.deleteUserForBinding(bindingId);
+        return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), null, null, null);
     }
 
     @Override
     public ServiceInstanceBinding getServiceInstanceBinding(String id) {
-        // TODO submit pull request to have this removed
         throw new IllegalStateException("Not implemented");
     }
 

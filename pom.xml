@@ -12,6 +12,8 @@
 
 	<properties>
 		<start-class>org.cloudfoundry.community.servicebroker.s3.config.Application</start-class>
+		
+		<spring-boot-cf-service-broker.version>2.3.3</spring-boot-cf-service-broker.version>
 	</properties>
 
 	<dependencies>
@@ -27,12 +29,12 @@
 		<dependency>
 			<groupId>org.cloudfoundry</groupId>
 			<artifactId>spring-boot-cf-service-broker</artifactId>
-			<version>2.3.2</version>
+			<version>${spring-boot-cf-service-broker.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cloudfoundry</groupId>
 			<artifactId>spring-boot-cf-service-broker-tests</artifactId>
-			<version>2.3.2</version>
+			<version>${spring-boot-cf-service-broker.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

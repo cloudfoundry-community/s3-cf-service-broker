@@ -18,10 +18,12 @@ package org.cloudfoundry.community.servicebroker.s3.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
 import com.amazonaws.services.identitymanagement.model.AccessKey;
+import com.amazonaws.services.identitymanagement.model.AccessKeyMetadata;
 import com.amazonaws.services.identitymanagement.model.AddUserToGroupRequest;
 import com.amazonaws.services.identitymanagement.model.CreateAccessKeyRequest;
 import com.amazonaws.services.identitymanagement.model.CreateAccessKeyResult;
@@ -29,10 +31,15 @@ import com.amazonaws.services.identitymanagement.model.CreateGroupRequest;
 import com.amazonaws.services.identitymanagement.model.CreateGroupResult;
 import com.amazonaws.services.identitymanagement.model.CreateUserRequest;
 import com.amazonaws.services.identitymanagement.model.CreateUserResult;
+import com.amazonaws.services.identitymanagement.model.DeleteAccessKeyRequest;
+import com.amazonaws.services.identitymanagement.model.DeleteGroupPolicyRequest;
 import com.amazonaws.services.identitymanagement.model.DeleteGroupRequest;
 import com.amazonaws.services.identitymanagement.model.DeleteUserRequest;
 import com.amazonaws.services.identitymanagement.model.Group;
+import com.amazonaws.services.identitymanagement.model.ListAccessKeysRequest;
+import com.amazonaws.services.identitymanagement.model.ListAccessKeysResult;
 import com.amazonaws.services.identitymanagement.model.PutGroupPolicyRequest;
+import com.amazonaws.services.identitymanagement.model.RemoveUserFromGroupRequest;
 import com.amazonaws.services.identitymanagement.model.User;
 
 /**
@@ -46,42 +53,59 @@ public class Iam {
     private final AmazonIdentityManagement iam;
     private final BucketGroupPolicy bucketGroupPolicy;
 
-    // TODO make configurable. Not required
-    private String groupPath = "/cloud-foundry/s3/";
-    // TODO make configurable. Can be empty
-    private String groupNamePrefix = "cloud-foundry-s3-";
+    private final String groupPath;
+    private final String groupNamePrefix;
 
-    // TODO make configurable. Can be empty
-    private String policyNamePrefix = "cloud-foundry-s3-";
+    private final String policyNamePrefix;
 
-    // TODO make configurable. Not required
-    private String userPath = "/cloud-foundry/s3/";
-    // TODO make configurable. Can be empty
-    private String userNamePrefix = "cloud-foundry-s3-";
+    private final String userPath;
+    private final String userNamePrefix;
 
     @Autowired
-    public Iam(AmazonIdentityManagement iam, BucketGroupPolicy bucketGroupPolicy) {
+    public Iam(AmazonIdentityManagement iam, BucketGroupPolicy bucketGroupPolicy,
+            @Value("${GROUP_PATH:/cloud-foundry/s3/}") String groupPath,
+            @Value("${GROUP_NAME_PREFIX:cloud-foundry-s3-}") String groupNamePrefix,
+            @Value("${POLICY_NAME_PREFIX:cloud-foundry-s3-}") String policyNamePrefix,
+            @Value("${USER_PATH:/cloud-foundry/s3/}") String userPath,
+            @Value("${USER_NAME_PREFIX:cloud-foundry-s3-}") String userNamePrefix) {
         this.iam = iam;
         this.bucketGroupPolicy = bucketGroupPolicy;
+        this.groupPath = groupPath;
+        this.groupNamePrefix = groupNamePrefix;
+        this.policyNamePrefix = policyNamePrefix;
+        this.userPath = userPath;
+        this.userNamePrefix = userNamePrefix;
     }
 
     public Group createGroupForBucket(String instanceId, String bucketName) {
         String groupName = getGroupNameForInstance(instanceId);
         logger.info("Creating group '{}' for bucket '{}'", groupName, bucketName);
+
         CreateGroupRequest request = new CreateGroupRequest(groupName);
         request.setPath(groupPath);
         CreateGroupResult result = iam.createGroup(request);
+        return result.getGroup();
+    }
+
+    public void applyGroupPolicyForBucket(String instanceId, String bucketName) {
+        String groupName = getGroupNameForInstance(instanceId);
 
         // https://forums.aws.amazon.com/message.jspa?messageID=356160
-        PutGroupPolicyRequest putGroupPolicyRequest = new PutGroupPolicyRequest();
+        PutGroupPolicyRequest request = new PutGroupPolicyRequest();
         logger.info("Putting policy document on group '{}': {}", groupName,
                 bucketGroupPolicy.policyDocumentForBucket(bucketName));
-        putGroupPolicyRequest.setGroupName(groupName);
-        putGroupPolicyRequest.setPolicyName(getPolicyNameForInstance(instanceId));
-        putGroupPolicyRequest.setPolicyDocument(bucketGroupPolicy.policyDocumentForBucket(bucketName));
-        iam.putGroupPolicy(putGroupPolicyRequest);
+        request.setGroupName(groupName);
+        request.setPolicyName(getPolicyNameForInstance(instanceId));
+        request.setPolicyDocument(bucketGroupPolicy.policyDocumentForBucket(bucketName));
+        iam.putGroupPolicy(request);
+    }
 
-        return result.getGroup();
+    public void deleteGroupPolicy(String instanceId) {
+        String groupName = getGroupNameForInstance(instanceId);
+        logger.info("Deleting policy document for group '{}'", groupName);
+
+        DeleteGroupPolicyRequest request = new DeleteGroupPolicyRequest(groupName, getPolicyNameForInstance(instanceId));
+        iam.deleteGroupPolicy(request);
     }
 
     public void deleteGroupForInstance(String instanceId) {
@@ -111,18 +135,6 @@ public class Iam {
         return userNamePrefix + bindingId;
     }
 
-    public void deleteUserForBinding(String bindingId) {
-        // TODO must remove user from group first
-        // RemoveUserFromGroupRequest groupRequest = new
-        // RemoveUserFromGroupRequest(groupName, userName);
-        // iam.removeUserFromGroup(removeUserFromGroupRequest);
-        String username = getUserNameForBinding(bindingId);
-        logger.info("Deleting user '{}' from service binding '{}'", username, bindingId);
-
-        DeleteUserRequest request = new DeleteUserRequest(username);
-        iam.deleteUser(request);
-    }
-
     public AccessKey createAccessKey(User user) {
         CreateAccessKeyRequest request = new CreateAccessKeyRequest().withUserName(user.getUserName());
         CreateAccessKeyResult result = iam.createAccessKey(request);
@@ -135,5 +147,42 @@ public class Iam {
         request.setGroupName(groupName);
         request.setUserName(user.getUserName());
         iam.addUserToGroup(request);
+    }
+
+    /**
+     * The user must not be a member of any groups or have any access keys.
+     * 
+     * @param bindingId
+     */
+    public void deleteUserForBinding(String bindingId) {
+        String username = getUserNameForBinding(bindingId);
+        logger.info("Deleting user '{}' from service binding '{}'", username, bindingId);
+
+        DeleteUserRequest request = new DeleteUserRequest(username);
+        iam.deleteUser(request);
+    }
+
+    public void removeUserFromGroup(String bindingId, String instanceId) {
+        String userName = getUserNameForBinding(bindingId);
+        String groupName = getGroupNameForInstance(instanceId);
+        logger.info("Removing user '{}' from group '{}'", userName, groupName);
+        // iam.listGroupsForUser(listGroupsForUserRequest)
+        RemoveUserFromGroupRequest removeUserFromGroupRequest = new RemoveUserFromGroupRequest(groupName, userName);
+        iam.removeUserFromGroup(removeUserFromGroupRequest);
+    }
+
+    public void deleteUserAccessKeys(String bindingId) {
+        String userName = getUserNameForBinding(bindingId);
+        logger.info("Deleting all access keys for user '{}'", userName);
+        ListAccessKeysRequest accessKeysRequest = new ListAccessKeysRequest();
+        accessKeysRequest.setUserName(userName);
+        ListAccessKeysResult accessKeysResult = iam.listAccessKeys(accessKeysRequest);
+        for (AccessKeyMetadata keyMeta : accessKeysResult.getAccessKeyMetadata()) {
+            DeleteAccessKeyRequest request = new DeleteAccessKeyRequest(keyMeta.getAccessKeyId());
+            request.setUserName(userName);
+            iam.deleteAccessKey(request);
+        }
+        // ListAccessKeysResult has truncation in it but there doesn't seem to
+        // be a way to use it
     }
 }
