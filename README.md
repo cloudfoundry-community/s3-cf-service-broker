@@ -52,7 +52,7 @@ IAM Group   | GROUP_PATH                        | /cloud-foundry/s3/
 
 ## User for Broker
 
-An AWS user must be created for the broker. The user's accessKey and secretKey must be provided using the environments variables AWS_ACCESS_KEY and AWS_SECRET_KEY.
+An AWS user must be created for the broker. The user's accessKey and secretKey must be provided using the environments variables `AWS_ACCESS_KEY` and `AWS_SECRET_KEY`.
 
 An example user policy for the broker user is provided in [broker-user-iam-policy.json](https://github.com/davidehringer/s3-cf-service-broker/blob/master/src/main/resources/broker-user-iam-policy.json). 
 If desired, you can further limit user and group resources in this policy based on prefixes defined above.
