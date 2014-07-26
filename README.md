@@ -23,15 +23,13 @@ mvn package && AWS_ACCESS_KEY=secret AWS_SECRET_KEY=secret java -jar target//s3-
 
 ## Broker Security
 
-[spring-boot-starter-security](https://github.com/spring-projects/spring-boot/tree/master/spring-boot-starters/spring-boot-starter-security) is used.  
-See the documentation here for configuration: [Spring boot security](http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#boot-features-security)
+[spring-boot-starter-security](https://github.com/spring-projects/spring-boot/tree/master/spring-boot-starters/spring-boot-starter-security) is used. See the documentation here for configuration: [Spring boot security](http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#boot-features-security)
 
 The default password configured is "password"
 
 ## Creation and Naming of AWS Resources 
 
-A service provisioning call will create an S3 bucket, an IAM group, and an IAM Policy to provide access controls on the bucket. A binding call will create an IAM user, generate access keys, ad 
-add it to the bucket's group. Unbinding and deprovisioning calls will delete all resources created.
+A service provisioning call will create an S3 bucket, an IAM group, and an IAM Policy to provide access controls on the bucket. A binding call will create an IAM user, generate access keys, and add it to the bucket's group. Unbinding and deprovisioning calls will delete all resources created.
 
 The following names are used and can be customized with a prefix:
 
@@ -54,8 +52,7 @@ IAM Group   | GROUP_PATH                        | /cloud-foundry/s3/
 
 An AWS user must be created for the broker. The user's accessKey and secretKey must be provided using the environments variables `AWS_ACCESS_KEY` and `AWS_SECRET_KEY`.
 
-An example user policy for the broker user is provided in [broker-user-iam-policy.json](https://github.com/davidehringer/s3-cf-service-broker/blob/master/src/main/resources/broker-user-iam-policy.json). 
-If desired, you can further limit user and group resources in this policy based on prefixes defined above.
+An example user policy for the broker user is provided in [broker-user-iam-policy.json](https://github.com/davidehringer/s3-cf-service-broker/blob/master/src/main/resources/broker-user-iam-policy.json). If desired, you can further limit user and group resources in this policy based on prefixes defined above.
 
 Note: The S3 policies could be more limited based on what is actually used. 
 
@@ -72,7 +69,7 @@ All buckets are tagged with the following values:
 * organizationGuid
 * spaceGuid
 
-- Custom tags?
+The ability to apply additional custom tags is in the works.
 
 ## Registering a Broker with the Cloud Controller
 
