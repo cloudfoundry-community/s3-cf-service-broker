@@ -1,10 +1,10 @@
 # Cloud Foundry Service Broker for Amazon S3
 
-In progress...
+A Cloud Foundry Service Broker for Amazon S3 built using the [spring-boot-cf-service-broker](https://github.com/cloudfoundry-community/spring-boot-cf-service-broker).
 
-## Design
+The broker currently publishes a single service and plan for provisioning S3 buckets. 
 
-The application is based on [spring-boot-cf-service-broker](https://github.com/cloudfoundry-community/spring-boot-cf-service-broker).  
+## Design 
 
 Does not maintain an internal database so it has no dependencies besides S3.
 
