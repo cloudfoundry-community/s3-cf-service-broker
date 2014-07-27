@@ -21,7 +21,9 @@ mvn package && AWS_ACCESS_KEY=secret AWS_SECRET_KEY=secret java -jar target//s3-
 
 ### In Cloud Foundry
 
-## Format of Credentials
+## Using the services in your application
+
+### Format of Credentials
 
 The credentials provided in a bind call have the following format:
 
@@ -33,6 +35,10 @@ The credentials provided in a bind call have the following format:
 	"secret_access_key":"secret"
 }
 ```
+
+### Java Applications - Spring Cloud
+
+For Java applications, you may consider using [Spring Cloud](https://github.com/spring-projects/spring-cloud) and the [spring-cloud-s3-service-connector](https://github.com/davidehringer/spring-cloud-s3-service-connector).
 
 ## Broker Security
 
