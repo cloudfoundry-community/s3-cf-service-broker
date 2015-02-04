@@ -104,7 +104,7 @@ public class BrokerConfiguration {
 
     private List<Plan> getPlans() {
         Plan basic = new Plan("s3-basic-plan", "Basic S3 Plan",
-                "An S3 plan providing a single bucket with umlimited storage.", getBasicPlanMetadata());
+                "An S3 plan providing a single bucket with unlimited storage.", getBasicPlanMetadata());
         return Arrays.asList(basic);
     }
 
