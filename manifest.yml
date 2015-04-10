@@ -1,0 +1,4 @@
+---
+applications:
+  - name: s3-cf-service-broker
+    buildpack: java_buildpack
