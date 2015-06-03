@@ -83,7 +83,7 @@ public class BrokerConfiguration {
     public Catalog catalog() throws JsonParseException, JsonMappingException, IOException {
         ServiceDefinition serviceDefinition = new ServiceDefinition("s3", "amazon-s3",
                 "Amazon S3 is storage for the Internet.", true, getPlans(), getTags(), getServiceDefinitionMetadata(),
-                null, null);
+                Arrays.asList("syslog_drain"), null);
         return new Catalog(Arrays.asList(serviceDefinition));
     }
 
