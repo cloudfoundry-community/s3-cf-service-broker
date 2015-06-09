@@ -4,6 +4,7 @@ import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+
+import java.util.UUID;
 
 import static com.jayway.restassured.RestAssured.given;
 
@@ -53,9 +56,9 @@ public abstract class ServiceBrokerV2IntegrationTestBase {
 
     protected final String spaceGuid = "thespace";
 
-    protected final String instanceId = "f0599b46-8f42-488f-8fc4-9fb4932d0d24";
+    protected static String instanceId;
 
-    protected final String appGuid = "4cc4e405-38e0-4a5f-af83-904742b74162";
+    protected static String appGuid;
 
     protected final String fetchCatalogPath = "/v2/catalog";
 
@@ -66,6 +69,12 @@ public abstract class ServiceBrokerV2IntegrationTestBase {
     @Before
     public void setUp() throws Exception {
         RestAssured.port = port;
+    }
+
+    @BeforeClass
+    public static void generateUniqueIds() {
+        instanceId = UUID.randomUUID().toString();
+        appGuid = UUID.randomUUID().toString();
     }
 
     /**
