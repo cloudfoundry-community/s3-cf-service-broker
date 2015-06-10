@@ -46,6 +46,19 @@ Add service broker to Cloud Foundry Marketplace:
 cf enable-service-access amazon-s3 -p "Basic S3 Plan" -o ORG
 ```
 
+## Testing
+
+Export AWS credentials environment variables:
+```
+export AWS_ACCESS_KEY="YOUR_AWS_ACCESS_KEY"
+export AWS_SECRET_KEY="YOUR_AWS_SECRET_KEY"
+```
+
+and execute tests with maven:
+```
+mvn test
+```
+
 ## Using the services in your application
 
 ### Format of Credentials

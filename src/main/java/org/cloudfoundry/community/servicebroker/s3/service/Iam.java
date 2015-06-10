@@ -178,8 +178,7 @@ public class Iam {
         accessKeysRequest.setUserName(userName);
         ListAccessKeysResult accessKeysResult = iam.listAccessKeys(accessKeysRequest);
         for (AccessKeyMetadata keyMeta : accessKeysResult.getAccessKeyMetadata()) {
-            DeleteAccessKeyRequest request = new DeleteAccessKeyRequest(keyMeta.getAccessKeyId());
-            request.setUserName(userName);
+            DeleteAccessKeyRequest request = new DeleteAccessKeyRequest(userName, keyMeta.getAccessKeyId());
             iam.deleteAccessKey(request);
         }
         // ListAccessKeysResult has truncation in it but there doesn't seem to
