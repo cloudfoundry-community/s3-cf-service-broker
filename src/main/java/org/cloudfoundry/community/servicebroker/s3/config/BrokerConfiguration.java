@@ -17,16 +17,14 @@ package org.cloudfoundry.community.servicebroker.s3.config;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.cloudfoundry.community.servicebroker.config.BrokerApiVersionConfig;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.Plan;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
-import org.cloudfoundry.community.servicebroker.s3.service.BucketGroupPolicy;
+import org.cloudfoundry.community.servicebroker.s3.plan.basic.BasicPlan;
+import org.cloudfoundry.community.servicebroker.s3.policy.BucketGroupPolicy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -40,8 +38,6 @@ import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagementClient;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
@@ -51,14 +47,15 @@ import com.google.common.io.Resources;
 @Configuration
 @ComponentScan(basePackages = "org.cloudfoundry.community.servicebroker", excludeFilters = { @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = BrokerApiVersionConfig.class) })
 public class BrokerConfiguration {
-    
+
     @Value("${AWS_ACCESS_KEY}")
     private String accessKey;
     
     @Value("${AWS_SECRET_KEY}")
     private String secretKey;
 
-    private AWSCredentials awsCredentials() {
+    @Bean
+    public AWSCredentials awsCredentials() {
         return new BasicAWSCredentials(accessKey, secretKey);
     }
 
@@ -80,7 +77,7 @@ public class BrokerConfiguration {
     }
 
     @Bean
-    public Catalog catalog() throws JsonParseException, JsonMappingException, IOException {
+    public Catalog catalog() throws IOException {
         ServiceDefinition serviceDefinition = new ServiceDefinition("s3", "amazon-s3",
                 "Amazon S3 is storage for the Internet.", true, getPlans(), getTags(), getServiceDefinitionMetadata(),
                 Arrays.asList("syslog_drain"), null);
@@ -103,18 +100,8 @@ public class BrokerConfiguration {
     }
 
     private List<Plan> getPlans() {
-        Plan basic = new Plan("s3-basic-plan", "Basic S3 Plan",
-                "An S3 plan providing a single bucket with unlimited storage.", getBasicPlanMetadata());
-        return Arrays.asList(basic);
-    }
-
-    private Map<String, Object> getBasicPlanMetadata() {
-        Map<String, Object> planMetadata = new HashMap<String, Object>();
-        planMetadata.put("bullets", getBasicPlanBullets());
-        return planMetadata;
-    }
-
-    private List<String> getBasicPlanBullets() {
-        return Arrays.asList("Single S3 bucket", "Unlimited storage", "Unlimited number of objects");
+        List<Plan> myPlans = new ArrayList<Plan>();
+        myPlans.add(BasicPlan.getPlan());
+        return myPlans;
     }
 }

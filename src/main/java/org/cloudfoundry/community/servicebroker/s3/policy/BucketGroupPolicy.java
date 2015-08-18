@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.cloudfoundry.community.servicebroker.s3.service;
+package org.cloudfoundry.community.servicebroker.s3.policy;
 
 /**
  * @author David Ehringer
@@ -25,7 +25,7 @@ public class BucketGroupPolicy {
     public BucketGroupPolicy(String policyDocument) {
         this.policyDocument = policyDocument;
     }
-    
+
     public String policyDocumentForBucket(String bucketName){
         return policyDocument.replace("${bucketName}", bucketName);
     }
