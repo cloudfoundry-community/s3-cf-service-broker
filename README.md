@@ -76,7 +76,7 @@ The credentials provided in a bind call have the following format:
 
 ### Java Applications - Spring Cloud
 
-For Java applications, you may consider using [Spring Cloud](https://github.com/spring-projects/spring-cloud) and the [spring-cloud-s3-service-connector](https://github.com/davidehringer/spring-cloud-s3-service-connector).
+For Java applications, you may consider using [Spring Cloud](https://github.com/spring-projects/spring-cloud) and the [spring-cloud-s3-service-connector](https://github.com/cloudfoundry-community/spring-cloud-s3-service-connector).
 
 ## Broker Security
 
@@ -109,13 +109,13 @@ IAM Group   | GROUP_PATH                        | /cloud-foundry/s3/
 
 An AWS user must be created for the broker. The user's accessKey and secretKey must be provided using the environments variables `AWS_ACCESS_KEY` and `AWS_SECRET_KEY`.
 
-An example user policy for the broker user is provided in [broker-user-iam-policy.json](https://github.com/davidehringer/s3-cf-service-broker/blob/master/src/main/resources/broker-user-iam-policy.json). If desired, you can further limit user and group resources in this policy based on prefixes defined above.
+An example user policy for the broker user is provided in [broker-user-iam-policy.json](https://github.com/cloudfoundry-community/s3-cf-service-broker/blob/master/src/main/resources/broker-user-iam-policy.json). If desired, you can further limit user and group resources in this policy based on prefixes defined above.
 
 Note: The S3 policies could be more limited based on what is actually used.
 
 ## Bucket Policy
 
-The group policy applied to all buckets created is provided in [default-bucket-policy.json](https://github.com/davidehringer/s3-cf-service-broker/blob/master/src/main/resources/default-bucket-policy.json).
+The group policy applied to all buckets created is provided in [default-bucket-policy.json](https://github.com/cloudfoundry-community/s3-cf-service-broker/blob/master/src/main/resources/default-bucket-policy.json).
 
 ## Bucket Tagging
 
