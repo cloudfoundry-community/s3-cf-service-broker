@@ -28,6 +28,7 @@ mvn package
 cf push s3-cf-service-broker -p target/s3-cf-service-broker-2.3.0-SNAPSHOT.jar --no-start
 cf set-env s3-cf-service-broker AWS_ACCESS_KEY "MYAWSKEY"
 cf set-env s3-cf-service-broker AWS_SECRET_KEY "MYAWSSECRET"
+cf set-env s3-cf-service-broker AWS_REGION "eu-west-1" # (optional, default: US (= us-east-1))
 cf set-env s3-cf-service-broker JAVA_OPTS "-Dsecurity.user.password=mysecret"
 ```
 
@@ -81,6 +82,7 @@ Resource          | Environment Variable | Default
 ------------------|----------------------|-------------
 Broker Access Key | AWS_ACCESS_KEY       | - (required)
 Broker Secret Key | AWS_SECRET_KEY       | - (required)
+S3 Region         | AWS_REGION           | US
 
 An example user policy for the broker user is provided in [broker-user-iam-policy.json](src/main/resources/broker-user-iam-policy.json). If desired, you can further limit user and group resources in this policy based on prefixes defined above.
 

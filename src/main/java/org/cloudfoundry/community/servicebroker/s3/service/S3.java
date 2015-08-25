@@ -29,6 +29,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.BucketTaggingConfiguration;
 import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.Region;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.model.S3VersionSummary;
 import com.amazonaws.services.s3.model.TagSet;
@@ -45,18 +46,20 @@ public class S3 {
 
     private final AmazonS3 s3;
     private final String bucketNamePrefix;
+    private final String region;
 
     @Autowired
-    public S3(AmazonS3 s3, @Value("${BUCKET_NAME_PREFIX:cloud-foundry-}") String bucketNamePrefix) {
+    public S3(AmazonS3 s3, @Value("${BUCKET_NAME_PREFIX:cloud-foundry-}") String bucketNamePrefix, @Value("${AWS_REGION:US}") String region) {
         this.s3 = s3;
         this.bucketNamePrefix = bucketNamePrefix;
+        this.region = region;
     }
 
     public Bucket createBucketForInstance(String instanceId, ServiceDefinition service, String planId,
             String organizationGuid, String spaceGuid) {
         String bucketName = getBucketNameForInstance(instanceId);
         logger.info("Creating bucket '{}' for serviceInstanceId '{}'", bucketName, instanceId);
-        Bucket bucket = s3.createBucket(bucketName);
+        Bucket bucket = s3.createBucket(bucketName, Region.fromValue(region));
 
         // TODO allow for additional, custom tagging options
         BucketTaggingConfiguration bucketTaggingConfiguration = new BucketTaggingConfiguration();
