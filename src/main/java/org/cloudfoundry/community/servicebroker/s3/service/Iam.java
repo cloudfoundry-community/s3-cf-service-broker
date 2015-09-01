@@ -20,35 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import com.amazonaws.services.identitymanagement.AmazonIdentityManagement;
-import com.amazonaws.services.identitymanagement.model.AccessKey;
-import com.amazonaws.services.identitymanagement.model.AccessKeyMetadata;
-import com.amazonaws.services.identitymanagement.model.AddUserToGroupRequest;
-import com.amazonaws.services.identitymanagement.model.CreateAccessKeyRequest;
-import com.amazonaws.services.identitymanagement.model.CreateAccessKeyResult;
-import com.amazonaws.services.identitymanagement.model.CreateGroupRequest;
-import com.amazonaws.services.identitymanagement.model.CreateGroupResult;
-import com.amazonaws.services.identitymanagement.model.CreateUserRequest;
-import com.amazonaws.services.identitymanagement.model.CreateUserResult;
-import com.amazonaws.services.identitymanagement.model.DeleteAccessKeyRequest;
-import com.amazonaws.services.identitymanagement.model.DeleteGroupPolicyRequest;
-import com.amazonaws.services.identitymanagement.model.DeleteGroupRequest;
-import com.amazonaws.services.identitymanagement.model.DeleteUserRequest;
-import com.amazonaws.services.identitymanagement.model.Group;
-import com.amazonaws.services.identitymanagement.model.ListAccessKeysRequest;
-import com.amazonaws.services.identitymanagement.model.ListAccessKeysResult;
-import com.amazonaws.services.identitymanagement.model.PutGroupPolicyRequest;
-import com.amazonaws.services.identitymanagement.model.RemoveUserFromGroupRequest;
-import com.amazonaws.services.identitymanagement.model.User;
+import com.amazonaws.services.identitymanagement.model.*;
 
-/**
- * @author David Ehringer
- */
-@Component
-public class Iam {
-
+public abstract class Iam {
     private static final Logger logger = LoggerFactory.getLogger(Iam.class);
 
     private final AmazonIdentityManagement iam;
@@ -78,62 +54,28 @@ public class Iam {
         this.userNamePrefix = userNamePrefix;
     }
 
-    public Group createGroupForBucket(String instanceId, String bucketName) {
-        String groupName = getGroupNameForInstance(instanceId);
-        logger.info("Creating group '{}' for bucket '{}'", groupName, bucketName);
-
-        CreateGroupRequest request = new CreateGroupRequest(groupName);
-        request.setPath(groupPath);
-        CreateGroupResult result = iam.createGroup(request);
-        return result.getGroup();
+    public BucketGroupPolicy getBucketGroupPolicy() {
+        return bucketGroupPolicy;
     }
 
-    public void applyGroupPolicyForBucket(String instanceId, String bucketName) {
-        String groupName = getGroupNameForInstance(instanceId);
-
-        // https://forums.aws.amazon.com/message.jspa?messageID=356160
-        PutGroupPolicyRequest request = new PutGroupPolicyRequest();
-        logger.info("Putting policy document on group '{}': {}", groupName,
-                bucketGroupPolicy.policyDocumentForBucket(bucketName));
-        request.setGroupName(groupName);
-        request.setPolicyName(getPolicyNameForInstance(instanceId));
-        request.setPolicyDocument(bucketGroupPolicy.policyDocumentForBucket(bucketName));
-        iam.putGroupPolicy(request);
+    public String getGroupPath() {
+        return groupPath;
     }
 
-    public void deleteGroupPolicy(String instanceId) {
-        String groupName = getGroupNameForInstance(instanceId);
-        logger.info("Deleting policy document for group '{}'", groupName);
-
-        DeleteGroupPolicyRequest request = new DeleteGroupPolicyRequest(groupName, getPolicyNameForInstance(instanceId));
-        iam.deleteGroupPolicy(request);
+    public String getGroupNamePrefix() {
+        return groupNamePrefix;
     }
 
-    public void deleteGroupForInstance(String instanceId) {
-        String groupName = getGroupNameForInstance(instanceId);
-        logger.info("Deleting group '{}' for instance '{}'", groupName, instanceId);
-        DeleteGroupRequest request = new DeleteGroupRequest(groupName);
-        iam.deleteGroup(request);
+    public String getPolicyNamePrefix() {
+        return policyNamePrefix;
     }
 
-    public String getGroupNameForInstance(String instanceId) {
-        return groupNamePrefix + instanceId;
+    public String getUserPath() {
+        return userPath;
     }
 
-    private String getPolicyNameForInstance(String instanceId) {
-        return policyNamePrefix + instanceId;
-    }
-
-    public User createUserForBinding(String bindingId) {
-        String username = getUserNameForBinding(bindingId);
-        logger.info("Creating user '{}' for service binding '{}'", username, bindingId);
-        CreateUserRequest request = new CreateUserRequest(username).withPath(userPath);
-        CreateUserResult result = iam.createUser(request);
-        return result.getUser();
-    }
-
-    public String getUserNameForBinding(String bindingId) {
-        return userNamePrefix + bindingId;
+    public String getUserNamePrefix() {
+        return userNamePrefix;
     }
 
     public AccessKey createAccessKey(User user) {
@@ -150,30 +92,59 @@ public class Iam {
         iam.addUserToGroup(request);
     }
 
+    public Group createGroup(String groupName) {
+        CreateGroupRequest request = new CreateGroupRequest(groupName);
+        request.setPath(groupPath);
+        CreateGroupResult result = iam.createGroup(request);
+        return result.getGroup();
+    }
+
+    public void applyGroupPolicy(String groupName, String policyName, String bucketName) {
+        // https://forums.aws.amazon.com/message.jspa?messageID=356160
+        PutGroupPolicyRequest request = new PutGroupPolicyRequest();
+        logger.info("Putting policy document on group '{}': {}", groupName,
+                bucketGroupPolicy.policyDocumentForBucket(bucketName));
+        request.setGroupName(groupName);
+        request.setPolicyName(policyName);
+        request.setPolicyDocument(bucketGroupPolicy.policyDocumentForBucket(bucketName));
+        iam.putGroupPolicy(request);
+    }
+
+    public void deleteGroupPolicy(String groupName, String policyName) {
+        logger.info("Deleting policy document for group '{}'", groupName);
+        DeleteGroupPolicyRequest request = new DeleteGroupPolicyRequest(groupName, policyName);
+        iam.deleteGroupPolicy(request);
+    }
+
+    public void deleteGroup(String groupName) {
+        DeleteGroupRequest request = new DeleteGroupRequest(groupName);
+        iam.deleteGroup(request);
+    }
+
+    public User createUser(String userName) {
+        CreateUserRequest request = new CreateUserRequest(userName).withPath(userPath);
+        CreateUserResult result = iam.createUser(request);
+        return result.getUser();
+    }
+
     /**
      * The user must not be a member of any groups or have any access keys.
-     * 
-     * @param bindingId
+     *
+     * @param userName
      */
-    public void deleteUserForBinding(String bindingId) {
-        String username = getUserNameForBinding(bindingId);
-        logger.info("Deleting user '{}' from service binding '{}'", username, bindingId);
-
-        DeleteUserRequest request = new DeleteUserRequest(username);
+    public void deleteUser(String userName) {
+        DeleteUserRequest request = new DeleteUserRequest(userName);
         iam.deleteUser(request);
     }
 
-    public void removeUserFromGroup(String bindingId, String instanceId) {
-        String userName = getUserNameForBinding(bindingId);
-        String groupName = getGroupNameForInstance(instanceId);
+    public void removeUserFromGroup(String userName, String groupName) {
         logger.info("Removing user '{}' from group '{}'", userName, groupName);
         // iam.listGroupsForUser(listGroupsForUserRequest)
         RemoveUserFromGroupRequest removeUserFromGroupRequest = new RemoveUserFromGroupRequest(groupName, userName);
         iam.removeUserFromGroup(removeUserFromGroupRequest);
     }
 
-    public void deleteUserAccessKeys(String bindingId) {
-        String userName = getUserNameForBinding(bindingId);
+    public void deleteUserAccessKeys(String userName) {
         logger.info("Deleting all access keys for user '{}'", userName);
         ListAccessKeysRequest accessKeysRequest = new ListAccessKeysRequest();
         accessKeysRequest.setUserName(userName);

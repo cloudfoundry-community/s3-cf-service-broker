@@ -23,7 +23,6 @@ import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.s3.plan.Plan;
-import org.cloudfoundry.community.servicebroker.s3.service.Iam;
 import org.cloudfoundry.community.servicebroker.s3.service.S3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,11 +36,11 @@ import java.util.Map;
 public class BasicPlan implements Plan {
     public static final String PLAN_ID = "s3-basic-plan";
 
-    private final Iam iam;
+    private final BasicPlanIam iam;
     private final S3 s3;
 
     @Autowired
-    public BasicPlan(Iam iam, S3 s3) {
+    public BasicPlan(BasicPlanIam iam, S3 s3) {
         this.iam = iam;
         this.s3 = s3;
     }
@@ -64,15 +63,15 @@ public class BasicPlan implements Plan {
     public ServiceInstance createServiceInstance(ServiceDefinition service, String serviceInstanceId, String planId,
                                                  String organizationGuid, String spaceGuid) {
         Bucket bucket = s3.createBucketForInstance(serviceInstanceId, service, planId, organizationGuid, spaceGuid);
-        iam.createGroupForBucket(serviceInstanceId, bucket.getName());
-        iam.applyGroupPolicyForBucket(serviceInstanceId, bucket.getName());
+        iam.createGroupForInstance(serviceInstanceId, bucket.getName());
+        iam.applyGroupPolicyForInstance(serviceInstanceId, bucket.getName());
         return new ServiceInstance(serviceInstanceId, service.getId(), planId, organizationGuid, spaceGuid, null);
     }
 
     public ServiceInstance deleteServiceInstance(String id) {
         ServiceInstance instance = s3.findServiceInstance(id);
         // TODO we need to make these deletes idempotent so we can handle retries on error
-        iam.deleteGroupPolicy(id);
+        iam.deleteGroupPolicyForInstance(id);
         iam.deleteGroupForInstance(id);
         s3.emptyBucket(id);
         s3.deleteBucket(id);
@@ -97,8 +96,8 @@ public class BasicPlan implements Plan {
     public ServiceInstanceBinding deleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance,
                                                                String serviceId, String planId) throws ServiceBrokerException {
         // TODO make operations idempotent so we can handle retries on error
-        iam.removeUserFromGroup(bindingId, serviceInstance.getId());
-        iam.deleteUserAccessKeys(bindingId);
+        iam.removeUserFromGroupForInstance(bindingId, serviceInstance.getId());
+        iam.deleteUserAccessKeysForBinding(bindingId);
         iam.deleteUserForBinding(bindingId);
         return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), null, null, null);
     }
