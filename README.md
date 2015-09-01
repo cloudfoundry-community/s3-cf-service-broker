@@ -43,20 +43,7 @@ cf create-service-broker s3-cf-service-broker user mysecret http://s3-cf-service
 
 Add service broker to Cloud Foundry Marketplace:
 ```
-cf enable-service-access amazon-s3 -p "Basic S3 Plan" -o ORG
-```
-
-## Testing
-
-Export AWS credentials environment variables:
-```
-export AWS_ACCESS_KEY="YOUR_AWS_ACCESS_KEY"
-export AWS_SECRET_KEY="YOUR_AWS_SECRET_KEY"
-```
-
-and execute tests with maven:
-```
-mvn test
+cf enable-service-access amazon-s3 -o ORG
 ```
 
 ## Using the services in your application
@@ -86,6 +73,21 @@ The default password configured is "password"
 
 ## Creation and Naming of AWS Resources
 
+### User for Broker
+
+An AWS user must be created for the broker. The user's accessKey and secretKey must be provided using the environments variables `AWS_ACCESS_KEY` and `AWS_SECRET_KEY`.
+
+Resource          | Environment Variable | Default
+------------------|----------------------|-------------
+Broker Access Key | AWS_ACCESS_KEY       | - (required)
+Broker Secret Key | AWS_SECRET_KEY       | - (required)
+
+An example user policy for the broker user is provided in [broker-user-iam-policy.json](src/main/resources/broker-user-iam-policy.json). If desired, you can further limit user and group resources in this policy based on prefixes defined above.
+
+Note: The S3 policies could be more limited based on what is actually used.
+
+### Basic Plan
+
 A service provisioning call will create an S3 bucket, an IAM group, and an IAM Policy to provide access controls on the bucket. A binding call will create an IAM user, generate access keys, and add it to the bucket's group. Unbinding and deprovisioning calls will delete all resources created.
 
 The following names are used and can be customized with a prefix:
@@ -104,20 +106,11 @@ Resource    | Custom Path Environment Variable  | Default Path
 IAM User    | USER_PATH                         | /cloud-foundry/s3/
 IAM Group   | GROUP_PATH                        | /cloud-foundry/s3/
 
+#### Bucket Policy
 
-## User for Broker
+The group policy applied to all buckets created is provided in [default-bucket-policy.json](src/main/resources/default-bucket-policy.json).
 
-An AWS user must be created for the broker. The user's accessKey and secretKey must be provided using the environments variables `AWS_ACCESS_KEY` and `AWS_SECRET_KEY`.
-
-An example user policy for the broker user is provided in [broker-user-iam-policy.json](https://github.com/cloudfoundry-community/s3-cf-service-broker/blob/master/src/main/resources/broker-user-iam-policy.json). If desired, you can further limit user and group resources in this policy based on prefixes defined above.
-
-Note: The S3 policies could be more limited based on what is actually used.
-
-## Bucket Policy
-
-The group policy applied to all buckets created is provided in [default-bucket-policy.json](https://github.com/cloudfoundry-community/s3-cf-service-broker/blob/master/src/main/resources/default-bucket-policy.json).
-
-## Bucket Tagging
+#### Bucket Tagging
 
 All buckets are tagged with the following values:
 * serviceInstanceId
@@ -131,3 +124,16 @@ The ability to apply additional custom tags is in the works.
 ## Registering a Broker with the Cloud Controller
 
 See [Managing Service Brokers](http://docs.cloudfoundry.org/services/managing-service-brokers.html).
+
+## Testing
+
+Export AWS credentials environment variables:
+```
+export AWS_ACCESS_KEY="YOUR_AWS_ACCESS_KEY"
+export AWS_SECRET_KEY="YOUR_AWS_SECRET_KEY"
+```
+
+and execute tests with maven:
+```
+mvn test
+```
