@@ -15,65 +15,42 @@
  */
 package org.cloudfoundry.community.servicebroker.s3.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceBindingExistsException;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
+import org.cloudfoundry.community.servicebroker.s3.plan.Plan;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceBindingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.amazonaws.services.identitymanagement.model.AccessKey;
-import com.amazonaws.services.identitymanagement.model.User;
 
 /**
  * @author David Ehringer
  */
 @Service
 public class S3ServiceInstanceBindingService implements ServiceInstanceBindingService {
-
-    private final S3 s3;
-    private final Iam iam;
+    private final Plan plan;
 
     @Autowired
-    public S3ServiceInstanceBindingService(S3 s3, Iam iam) {
-        this.s3 = s3;
-        this.iam = iam;
+    public S3ServiceInstanceBindingService(Plan plan) {
+        this.plan = plan;
     }
 
     @Override
     public ServiceInstanceBinding createServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance,
             String serviceId, String planId, String appGuid) throws ServiceInstanceBindingExistsException,
             ServiceBrokerException {
-        User user = iam.createUserForBinding(bindingId);
-        AccessKey accessKey = iam.createAccessKey(user);
-        // TODO create password and add to credentials
-        iam.addUserToGroup(user, iam.getGroupNameForInstance(serviceInstance.getId()));
-
-        Map<String, Object> credentials = new HashMap<String, Object>();
-        credentials.put("bucket", s3.getBucketNameForInstance(serviceInstance.getId()));
-        credentials.put("username", user.getUserName());
-        credentials.put("access_key_id", accessKey.getAccessKeyId());
-        credentials.put("secret_access_key", accessKey.getSecretAccessKey());
-        return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, null, appGuid);
+        return plan.createServiceInstanceBinding(bindingId, serviceInstance, serviceId, planId, appGuid);
     }
 
     @Override
     public ServiceInstanceBinding deleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance,
             String serviceId, String planId) throws ServiceBrokerException {
-        // TODO make operations idempotent so we can handle retries on error
-        iam.removeUserFromGroup(bindingId, serviceInstance.getId());
-        iam.deleteUserAccessKeys(bindingId);
-        iam.deleteUserForBinding(bindingId);
-        return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), null, null, null);
+        return plan.deleteServiceInstanceBinding(bindingId, serviceInstance, serviceId, planId);
     }
 
     @Override
     public ServiceInstanceBinding getServiceInstanceBinding(String id) {
         throw new IllegalStateException("Not implemented");
     }
-
 }

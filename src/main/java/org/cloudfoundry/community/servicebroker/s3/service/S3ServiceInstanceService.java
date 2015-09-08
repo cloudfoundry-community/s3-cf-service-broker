@@ -21,56 +21,42 @@ import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceExistsException;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
+import org.cloudfoundry.community.servicebroker.s3.plan.Plan;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.amazonaws.services.s3.model.Bucket;
 
 /**
  * @author David Ehringer
  */
 @Service
 public class S3ServiceInstanceService implements ServiceInstanceService {
-
-    private final Iam iam;
-    private final S3 s3;
+    private final Plan plan;
 
     @Autowired
-    public S3ServiceInstanceService(Iam iam, S3 s3) {
-        this.iam = iam;
-        this.s3 = s3;
+    public S3ServiceInstanceService(Plan plan) {
+        this.plan = plan;
     }
 
     @Override
     public ServiceInstance createServiceInstance(ServiceDefinition service, String serviceInstanceId, String planId,
             String organizationGuid, String spaceGuid) throws ServiceInstanceExistsException, ServiceBrokerException {
-        Bucket bucket = s3.createBucketForInstance(serviceInstanceId, service, planId, organizationGuid, spaceGuid);
-        iam.createGroupForBucket(serviceInstanceId, bucket.getName());
-        iam.applyGroupPolicyForBucket(serviceInstanceId, bucket.getName());
-        return new ServiceInstance(serviceInstanceId, service.getId(), planId, organizationGuid, spaceGuid, null);
+        return plan.createServiceInstance(service, serviceInstanceId, planId, organizationGuid, spaceGuid);
     }
 
     @Override
     public ServiceInstance deleteServiceInstance(String id, String serviceId, String planId)
             throws ServiceBrokerException {
-        ServiceInstance instance = getServiceInstance(id);
-        // TODO we need to make these deletes idempotent so we can handle retries on error
-        iam.deleteGroupPolicy(id);
-        iam.deleteGroupForInstance(id);
-        s3.emptyBucket(id);
-        s3.deleteBucket(id);
-        return instance;
+        return plan.deleteServiceInstance(id);
     }
 
     @Override
     public List<ServiceInstance> getAllServiceInstances() {
-        return s3.getAllServiceInstances();
+        return plan.getAllServiceInstances();
     }
 
     @Override
     public ServiceInstance getServiceInstance(String id) {
-        return s3.findServiceInstance(id);
+        return plan.getServiceInstance(id);
     }
-
 }
