@@ -25,6 +25,7 @@
         "iam:DeleteGroup",
         "iam:DeleteGroupPolicy",
         "iam:DeleteUser",
+        "iam:DeleteUserPolicy",
         "iam:GetGroup",
         "iam:GetGroupPolicy",
         "iam:GetUser",
