@@ -8,7 +8,9 @@ The broker currently publishes a single service and plan for provisioning S3 buc
 
 The broker uses meta data in S3 and naming conventions to maintain the state of the services it is brokering. It does not maintain an internal database so it has no dependencies besides S3.
 
-Capability with the Cloud Foundry service broker API is indicated by the project version number. For example, version 2.3.0 is based off the 2.3 version of the broker API.
+## Releases
+
+Stable versions have been tagged as [releases](https://github.com/cloudfoundry-community/s3-cf-service-broker/releases).
 
 ## Running
 
@@ -17,7 +19,7 @@ Simply run the JAR file and provide AWS credentials via the `AWS_ACCESS_KEY` and
 ### Locally
 
 ```
-mvn package && AWS_ACCESS_KEY=secret AWS_SECRET_KEY=secret java -jar target/s3-cf-service-broker-2.3.0-SNAPSHOT.jar
+mvn package && AWS_ACCESS_KEY=secret AWS_SECRET_KEY=secret java -jar target/s3-cf-service-broker-2.0.0-SNAPSHOT.jar
 ```
 
 ### In Cloud Foundry
@@ -139,3 +141,32 @@ and execute tests with maven:
 ```
 mvn test
 ```
+
+## Contributing
+
+In the spirit of [free software](http://www.fsf.org/licensing/essays/free-sw.html), **everyone** is encouraged to help improve this project.
+** All contributions should be done through pull requests. **
+
+Here are some ways *you* can contribute:
+
+* by using alpha, beta, and prerelease versions
+* by reporting bugs
+* by suggesting new features
+* by writing or editing documentation
+* by writing specifications
+* by writing code (**no patch is too small**: fix typos, add comments, clean up inconsistent whitespace)
+* by refactoring code
+* by closing [issues](https://github.com/cf-platform-eng/rds-broker/issues)
+* by reviewing patches
+
+### Submitting an Issue
+
+We use the [GitHub issue tracker](https://github.com/cloudfoundry-community/s3-cf-service-broker/issues) to track bugs and features. Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. You can indicate support for an existing issue by voting it up. When submitting a bug report, please include a [Gist](http://gist.github.com/) that includes a stack trace and any details that may be necessary to reproduce the bug, including your Golang version and operating system. Ideally, a bug report should include a pull request with failing specs.
+
+### Submitting a Pull Request
+
+1. Fork the project.
+2. Create a topic branch.
+3. Implement your feature or bug fix.
+4. Commit and push your changes.
+5. Submit a pull request.
