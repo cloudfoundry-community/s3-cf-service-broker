@@ -8,8 +8,6 @@ The broker currently publishes a single service and plan for provisioning S3 buc
 
 The broker uses meta data in S3 and naming conventions to maintain the state of the services it is brokering. It does not maintain an internal database so it has no dependencies besides S3.
 
-Capability with the Cloud Foundry service broker API is indicated by the project version number. For example, version 2.3.0 is based off the 2.3 version of the broker API.
-
 ## Running
 
 Simply run the JAR file and provide AWS credentials via the `AWS_ACCESS_KEY` and `AWS_SECRET_KEY` environment variables.
