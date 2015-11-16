@@ -145,7 +145,7 @@ mvn test
 ## Contributing
 
 In the spirit of [free software](http://www.fsf.org/licensing/essays/free-sw.html), **everyone** is encouraged to help improve this project.
-** All contributions should be done through pull requests. **
+**All contributions should be done through pull requests.**
 
 Here are some ways *you* can contribute:
 
