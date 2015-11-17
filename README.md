@@ -68,23 +68,41 @@ The credentials provided in a bind call have the following format:
 
 For Java applications, you may consider using [Spring Cloud](https://github.com/spring-projects/spring-cloud) and the [spring-cloud-s3-service-connector](https://github.com/cloudfoundry-community/spring-cloud-s3-service-connector).
 
-## Broker Security
+## Configuration
 
-[spring-boot-starter-security](https://github.com/spring-projects/spring-boot/tree/master/spring-boot-starters/spring-boot-starter-security) is used. See the documentation here for configuration: [Spring boot security](http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#boot-features-security)
+### General Configuration
 
-The default password configured is "password"
+The following general configuration options are available.
 
-## Creation and Naming of AWS Resources
+Environment Variable         | Required  | Default
+-----------------------------|-----------|-------------
+`AWS_ACCESS_KEY`             | x         |
+`AWS_SECRET_KEY`             | x         |
+`AWS_REGION`                 |           | `US`
+`PROXY_HOST`                 |           | none
+`PROXY_PORT`                 |           | none
+`PROXY_USERNAME`             |           | none
+`PROXY_PASSWORD`             |           | none
+`PREEMPTIVE_PROXY_BASE_AUTH` |           | `false`
+
+### Broker Security
+
+[spring-boot-starter-security](https://github.com/spring-projects/spring-boot/tree/master/spring-boot-starters/spring-boot-starter-security)
+is used. See the documentation here for configuration: [Spring boot security](http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#boot-features-security)
+
+The default password configured is "password" (see [application.properties](src/main/resources/application.properties)).
+
+You may also configure security via environment variables as noted in the Spring Boot documentation.
+
+Environment Variable         | Required  | Default
+-----------------------------|-----------|-------------
+`SECURITY_USER_NAME`         |           | `user`
+`SECURITY_USER_PASSWORD`     |           | `password`
 
 ### User for Broker
 
-An AWS user must be created for the broker. The user's accessKey and secretKey must be provided using the environments variables `AWS_ACCESS_KEY` and `AWS_SECRET_KEY`.
-
-Resource          | Environment Variable | Default
-------------------|----------------------|-------------
-Broker Access Key | AWS_ACCESS_KEY       | - (required)
-Broker Secret Key | AWS_SECRET_KEY       | - (required)
-S3 Region         | AWS_REGION           | US
+An AWS user must be created for the broker. The user's accessKey and secretKey must be provided using the environments
+variables `AWS_ACCESS_KEY` and `AWS_SECRET_KEY` as noted above.
 
 An example user policy for the broker user is provided in [broker-user-iam-policy.json](src/main/resources/broker-user-iam-policy.json). If desired, you can further limit user and group resources in this policy based on prefixes defined above.
 

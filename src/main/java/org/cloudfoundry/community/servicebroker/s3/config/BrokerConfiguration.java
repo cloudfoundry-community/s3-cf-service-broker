@@ -19,12 +19,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
+import com.amazonaws.ClientConfiguration;
 import org.cloudfoundry.community.servicebroker.config.BrokerApiVersionConfig;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.Plan;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.s3.plan.basic.BasicPlan;
 import org.cloudfoundry.community.servicebroker.s3.policy.BucketGroupPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -48,25 +50,22 @@ import com.google.common.io.Resources;
 @ComponentScan(basePackages = "org.cloudfoundry.community.servicebroker", excludeFilters = { @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = BrokerApiVersionConfig.class) })
 public class BrokerConfiguration {
 
-    @Value("${AWS_ACCESS_KEY}")
-    private String accessKey;
-    
-    @Value("${AWS_SECRET_KEY}")
-    private String secretKey;
+    @Autowired
+    private AwsClientConfiguration awsClientConfiguration;
 
     @Bean
     public AWSCredentials awsCredentials() {
-        return new BasicAWSCredentials(accessKey, secretKey);
+        return new BasicAWSCredentials(awsClientConfiguration.getAwsAccessKey(), awsClientConfiguration.getAwsSecretKey());
     }
 
     @Bean
     public AmazonIdentityManagement amazonIdentityManagement() {
-        return new AmazonIdentityManagementClient(awsCredentials());
+        return new AmazonIdentityManagementClient(awsCredentials(), awsClientConfiguration.toClientConfiguration());
     }
 
     @Bean
     public AmazonS3 amazonS3() {
-        return new AmazonS3Client(awsCredentials());
+        return new AmazonS3Client(awsCredentials(), awsClientConfiguration.toClientConfiguration());
     }
 
     @Bean

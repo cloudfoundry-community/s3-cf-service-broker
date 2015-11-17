@@ -30,9 +30,12 @@ import com.jayway.restassured.response.ValidatableResponse;
 import org.apache.http.HttpStatus;
 import org.cloudfoundry.community.servicebroker.ServiceBrokerV2IntegrationTestBase;
 import org.cloudfoundry.community.servicebroker.s3.config.Application;
+import org.cloudfoundry.community.servicebroker.s3.config.AwsClientConfiguration;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.runners.MethodSorters;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 
@@ -50,8 +53,12 @@ import static org.junit.Assert.assertTrue;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class S3ServiceBrokerV2IntegrationTests extends ServiceBrokerV2IntegrationTestBase {
 
+    @Autowired
     private AmazonS3 s3;
+    @Autowired
     private AmazonIdentityManagementClient iam;
+    @Autowired
+    private AwsClientConfiguration awsClientConfiguration;
 
     @Value("${BUCKET_NAME_PREFIX:cloud-foundry-}")
     private String bucketNamePrefix;
@@ -63,8 +70,6 @@ public class S3ServiceBrokerV2IntegrationTests extends ServiceBrokerV2Integratio
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        s3 = new AmazonS3Client();
-        iam = new AmazonIdentityManagementClient();
     }
 
     private boolean doesGroupExist(String groupName) {
@@ -77,7 +82,7 @@ public class S3ServiceBrokerV2IntegrationTests extends ServiceBrokerV2Integratio
     }
 
     private void testBucketOperations(String accessKey, String secretKey, String bucketName) throws IOException {
-        AmazonS3Client instanceS3 = new AmazonS3Client(new BasicAWSCredentials(accessKey, secretKey));
+        AmazonS3Client instanceS3 = new AmazonS3Client(new BasicAWSCredentials(accessKey, secretKey), awsClientConfiguration.toClientConfiguration());
         assertTrue(instanceS3.doesBucketExist(bucketName));
         String objectName = "testObject";
         String objectContent = "Hello World!";
