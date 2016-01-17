@@ -3,4 +3,5 @@
 .classpath
 .settings
 .idea
+.envrc
 *.iml
