@@ -3,6 +3,7 @@ package org.cloudfoundry.community.servicebroker.s3.config;
 import org.cloudfoundry.community.servicebroker.model.Plan;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.s3.plan.basic.BasicPlan;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,9 +16,15 @@ import java.util.*;
 @Configuration
 public class ServiceConfiguration {
 
+    @Value("${SERVICE_ID:s3}")
+    private String serviceId;
+
+    @Value("${SERVICE_NAME:amazon-s3}")
+    private String serviceName;
+
     @Bean
     public ServiceDefinition serviceDefinition() throws IOException {
-        return new ServiceDefinition("s3", "amazon-s3",
+        return new ServiceDefinition(serviceId, serviceName,
                 "Amazon S3 is storage for the Internet.", true, getPlans(), getTags(), getServiceDefinitionMetadata(),
                 Arrays.asList("syslog_drain"), null);
     }
