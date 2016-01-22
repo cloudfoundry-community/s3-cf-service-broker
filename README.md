@@ -110,6 +110,15 @@ Note: The S3 policies could be more limited based on what is actually used.
 
 ### Basic Plan
 
+The the following attributes of the service and plan can be configured:
+
+Environment Variable         | Default
+-----------------------------|-------------
+`SERVICE_ID`                 | `s3`
+`SERVICE_NAME`               | `amazon-s3`
+`PLAN_ID`                    | `s3-basic-plan`
+`PLAN_NAME`                  | `basic`
+
 A service provisioning call will create an S3 bucket, an IAM group, and an IAM Policy to provide access controls on the bucket. A binding call will create an IAM user, generate access keys, and add it to the bucket's group. Unbinding and deprovisioning calls will delete all resources created.
 
 The following names are used and can be customized with a prefix:
