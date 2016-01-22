@@ -19,7 +19,7 @@ Simply run the JAR file and provide AWS credentials via the `AWS_ACCESS_KEY` and
 ### Locally
 
 ```
-mvn package && AWS_ACCESS_KEY=secret AWS_SECRET_KEY=secret java -jar target/s3-cf-service-broker-2.0.0-SNAPSHOT.jar
+mvn package && AWS_ACCESS_KEY=secret AWS_SECRET_KEY=secret java -jar target/s3-cf-service-broker-2.1.0-SNAPSHOT.jar
 ```
 
 ### In Cloud Foundry
@@ -28,7 +28,7 @@ Build s3-cf-service-broker and push it to Cloud Foundry:
 
 ```
 mvn package
-cf push s3-cf-service-broker -p target/s3-cf-service-broker-2.0.0-SNAPSHOT.jar --no-start
+cf push s3-cf-service-broker -p target/s3-cf-service-broker-2.1.0-SNAPSHOT.jar --no-start
 cf set-env s3-cf-service-broker AWS_ACCESS_KEY "MYAWSKEY"
 cf set-env s3-cf-service-broker AWS_SECRET_KEY "MYAWSSECRET"
 cf set-env s3-cf-service-broker SECURITY_USER_PASSWORD "mysecret"
