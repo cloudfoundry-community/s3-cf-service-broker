@@ -47,8 +47,8 @@ public class BasicPlan implements Plan {
         this.s3 = s3;
     }
 
-    public static org.cloudfoundry.community.servicebroker.model.Plan getPlan() {
-        return new org.cloudfoundry.community.servicebroker.model.Plan(PLAN_ID, "basic", "An S3 plan providing a single bucket with unlimited storage.",
+    public static org.cloudfoundry.community.servicebroker.model.Plan getPlan(String planId, String planName) {
+        return new org.cloudfoundry.community.servicebroker.model.Plan(planId, planName, "An S3 plan providing a single bucket with unlimited storage.",
                 getPlanMetadata());
     }
 
