@@ -22,6 +22,12 @@ public class ServiceConfiguration {
     @Value("${SERVICE_NAME:amazon-s3}")
     private String serviceName;
 
+    @Value("${PLAN_ID:s3-basic-plan}")
+    private String basicPlanId;
+
+    @Value("${PLAN_NAME:basic}")
+    private String basicPlanName;
+
     @Bean
     public ServiceDefinition serviceDefinition() throws IOException {
         return new ServiceDefinition(serviceId, serviceName,
@@ -46,7 +52,7 @@ public class ServiceConfiguration {
 
     private List<Plan> getPlans() {
         List<Plan> myPlans = new ArrayList<Plan>();
-        myPlans.add(BasicPlan.getPlan());
+        myPlans.add(BasicPlan.getPlan(basicPlanId, basicPlanName));
         return myPlans;
     }
 }
