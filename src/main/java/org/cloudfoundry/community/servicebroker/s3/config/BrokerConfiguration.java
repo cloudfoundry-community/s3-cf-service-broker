@@ -76,31 +76,7 @@ public class BrokerConfiguration {
     }
 
     @Bean
-    public Catalog catalog() throws IOException {
-        ServiceDefinition serviceDefinition = new ServiceDefinition("s3", "amazon-s3",
-                "Amazon S3 is storage for the Internet.", true, getPlans(), getTags(), getServiceDefinitionMetadata(),
-                Arrays.asList("syslog_drain"), null);
+    public Catalog catalog(ServiceDefinition serviceDefinition) throws IOException {
         return new Catalog(Arrays.asList(serviceDefinition));
-    }
-
-    private List<String> getTags() {
-        return Arrays.asList("s3", "object-storage");
-    }
-
-    private Map<String, Object> getServiceDefinitionMetadata() {
-        Map<String, Object> sdMetadata = new HashMap<String, Object>();
-        sdMetadata.put("displayName", "Amazon S3");
-        sdMetadata.put("imageUrl", "http://a1.awsstatic.com/images/logos/aws_logo.png");
-        sdMetadata.put("longDescription", "Amazon S3 Service");
-        sdMetadata.put("providerDisplayName", "Amazon");
-        sdMetadata.put("documentationUrl", "http://aws.amazon.com/s3");
-        sdMetadata.put("supportUrl", "http://aws.amazon.com/s3");
-        return sdMetadata;
-    }
-
-    private List<Plan> getPlans() {
-        List<Plan> myPlans = new ArrayList<Plan>();
-        myPlans.add(BasicPlan.getPlan());
-        return myPlans;
     }
 }
