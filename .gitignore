@@ -5,3 +5,4 @@
 .idea
 .envrc
 *.iml
+*-manifest.yml
