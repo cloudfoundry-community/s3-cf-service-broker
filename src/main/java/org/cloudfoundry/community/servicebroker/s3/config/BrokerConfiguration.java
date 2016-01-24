@@ -26,6 +26,8 @@ import org.cloudfoundry.community.servicebroker.model.Plan;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.s3.plan.basic.BasicPlan;
 import org.cloudfoundry.community.servicebroker.s3.policy.BucketGroupPolicy;
+import org.cloudfoundry.community.servicebroker.service.BeanCatalogService;
+import org.cloudfoundry.community.servicebroker.service.CatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -76,7 +78,10 @@ public class BrokerConfiguration {
     }
 
     @Bean
-    public Catalog catalog(ServiceDefinition serviceDefinition) throws IOException {
+    public Catalog catalog() throws IOException {
+        ServiceDefinition serviceDefinition = new ServiceDefinition("s3", "amazon-s3",
+                "Amazon S3 is storage for the Internet.", true, false, getPlans(), getTags(), getServiceDefinitionMetadata(),
+                Arrays.asList("syslog_drain"), null);
         return new Catalog(Arrays.asList(serviceDefinition));
     }
 }

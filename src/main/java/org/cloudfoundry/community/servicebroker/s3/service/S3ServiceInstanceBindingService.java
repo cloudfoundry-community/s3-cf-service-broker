@@ -17,8 +17,7 @@ package org.cloudfoundry.community.servicebroker.s3.service;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceBindingExistsException;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
+import org.cloudfoundry.community.servicebroker.model.*;
 import org.cloudfoundry.community.servicebroker.s3.plan.Plan;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceBindingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,20 +36,14 @@ public class S3ServiceInstanceBindingService implements ServiceInstanceBindingSe
     }
 
     @Override
-    public ServiceInstanceBinding createServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance,
-            String serviceId, String planId, String appGuid) throws ServiceInstanceBindingExistsException,
-            ServiceBrokerException {
-        return plan.createServiceInstanceBinding(bindingId, serviceInstance, serviceId, planId, appGuid);
+    public ServiceInstanceBinding createServiceInstanceBinding(CreateServiceInstanceBindingRequest request)
+            throws ServiceInstanceBindingExistsException, ServiceBrokerException {
+        return plan.createServiceInstanceBinding(request);
     }
 
     @Override
-    public ServiceInstanceBinding deleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance,
-            String serviceId, String planId) throws ServiceBrokerException {
-        return plan.deleteServiceInstanceBinding(bindingId, serviceInstance, serviceId, planId);
-    }
-
-    @Override
-    public ServiceInstanceBinding getServiceInstanceBinding(String id) {
-        throw new IllegalStateException("Not implemented");
+    public ServiceInstanceBinding deleteServiceInstanceBinding(
+            DeleteServiceInstanceBindingRequest request) throws ServiceBrokerException {
+        return plan.deleteServiceInstanceBinding(request);
     }
 }

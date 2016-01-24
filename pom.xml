@@ -13,7 +13,7 @@
 	<properties>
 		<start-class>org.cloudfoundry.community.servicebroker.s3.config.Application</start-class>
 		
-		<spring-boot-cf-service-broker.version>2.3.3</spring-boot-cf-service-broker.version>
+		<spring-boot-cf-service-broker.version>2.4.1</spring-boot-cf-service-broker.version>
 	</properties>
 
 	<dependencies>

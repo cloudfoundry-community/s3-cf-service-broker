@@ -17,7 +17,7 @@ package org.cloudfoundry.community.servicebroker.s3.service;
 
 import java.util.List;
 
-import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
+import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class S3 {
         this.region = region;
     }
 
-    public Bucket createBucketForInstance(String instanceId, ServiceDefinition service, String planId,
+    public Bucket createBucketForInstance(String instanceId, String serviceDefinitionId, String planId,
             String organizationGuid, String spaceGuid) {
         String bucketName = getBucketNameForInstance(instanceId);
         logger.info("Creating bucket '{}' for serviceInstanceId '{}'", bucketName, instanceId);
@@ -65,7 +65,7 @@ public class S3 {
         BucketTaggingConfiguration bucketTaggingConfiguration = new BucketTaggingConfiguration();
         TagSet tagSet = new TagSet();
         tagSet.setTag("serviceInstanceId", instanceId);
-        tagSet.setTag("serviceDefinitionId", service.getId());
+        tagSet.setTag("serviceDefinitionId", serviceDefinitionId);
         tagSet.setTag("planId", planId);
         tagSet.setTag("organizationGuid", organizationGuid);
         tagSet.setTag("spaceGuid", spaceGuid);
@@ -162,8 +162,9 @@ public class S3 {
         String planId = tagSet.getTag("planId");
         String organizationGuid = tagSet.getTag("organizationGuid");
         String spaceGuid = tagSet.getTag("spaceGuid");
-        ServiceInstance serviceInstance = new ServiceInstance(serviceInstanceId, serviceDefinitionId, planId,
-                organizationGuid, spaceGuid, null);
-        return serviceInstance;
+
+        CreateServiceInstanceRequest request = new CreateServiceInstanceRequest(
+                serviceDefinitionId, planId,organizationGuid,spaceGuid).withServiceInstanceId(serviceInstanceId);
+        return new ServiceInstance(request);
     }
 }

@@ -118,7 +118,7 @@ public class S3ServiceBrokerV2IntegrationTests extends ServiceBrokerV2Integratio
                 "}";
 
 
-        ValidatableResponse response = given().auth().basic(username, password).request().contentType(ContentType.JSON).body(request_body).when().put(createBindingPath).then().statusCode(HttpStatus.SC_CREATED);
+        ValidatableResponse response = given().header(apiHeader).auth().basic(username, password).request().contentType(ContentType.JSON).body(request_body).when().put(createBindingPath).then().statusCode(HttpStatus.SC_CREATED);
         String accessKey = response.extract().path("credentials.access_key_id");
         String secretKey = response.extract().path("credentials.secret_access_key");
 

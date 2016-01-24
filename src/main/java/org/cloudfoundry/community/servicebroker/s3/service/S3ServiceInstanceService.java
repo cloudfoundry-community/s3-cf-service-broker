@@ -17,10 +17,11 @@ package org.cloudfoundry.community.servicebroker.s3.service;
 
 import java.util.List;
 
+import com.amazonaws.services.dynamodbv2.model.transform.DeleteRequestJsonUnmarshaller;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceExistsException;
-import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
+import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceUpdateNotSupportedException;
+import org.cloudfoundry.community.servicebroker.model.*;
 import org.cloudfoundry.community.servicebroker.s3.plan.Plan;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,20 +40,22 @@ public class S3ServiceInstanceService implements ServiceInstanceService {
     }
 
     @Override
-    public ServiceInstance createServiceInstance(ServiceDefinition service, String serviceInstanceId, String planId,
-            String organizationGuid, String spaceGuid) throws ServiceInstanceExistsException, ServiceBrokerException {
-        return plan.createServiceInstance(service, serviceInstanceId, planId, organizationGuid, spaceGuid);
+    public ServiceInstance createServiceInstance(CreateServiceInstanceRequest request)
+            throws ServiceInstanceExistsException, ServiceBrokerException {
+        return plan.createServiceInstance(request);
     }
 
     @Override
-    public ServiceInstance deleteServiceInstance(String id, String serviceId, String planId)
+    public ServiceInstance deleteServiceInstance(DeleteServiceInstanceRequest request)
             throws ServiceBrokerException {
-        return plan.deleteServiceInstance(id);
+        return plan.deleteServiceInstance(request);
     }
 
     @Override
-    public List<ServiceInstance> getAllServiceInstances() {
-        return plan.getAllServiceInstances();
+    public ServiceInstance updateServiceInstance(UpdateServiceInstanceRequest request)
+            throws ServiceBrokerException, ServiceInstanceUpdateNotSupportedException {
+
+        throw new ServiceInstanceUpdateNotSupportedException("Updating this Service Instance is not supported");
     }
 
     @Override
