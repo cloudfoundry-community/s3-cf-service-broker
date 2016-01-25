@@ -31,7 +31,7 @@ public class ServiceConfiguration {
     @Bean
     public ServiceDefinition serviceDefinition() throws IOException {
         return new ServiceDefinition(serviceId, serviceName,
-                "Amazon S3 is storage for the Internet.", true, getPlans(), getTags(), getServiceDefinitionMetadata(),
+                "Amazon S3 is storage for the Internet.", true, false, getPlans(), getTags(), getServiceDefinitionMetadata(),
                 Arrays.asList("syslog_drain"), null);
     }
 

@@ -17,6 +17,7 @@ package org.cloudfoundry.community.servicebroker;
 
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Header;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -52,6 +53,12 @@ import static com.jayway.restassured.RestAssured.given;
 @IntegrationTest("server.port:0")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class ServiceBrokerV2IntegrationTestBase {
+
+    final static String API_VERSION_HEADER = "X-Broker-Api-Version";
+
+    final static String API_VERSION = "2.4";
+
+    protected Header apiHeader = new Header(API_VERSION_HEADER, API_VERSION);
 
     @Value("${local.server.port}")
     protected int port;
@@ -101,12 +108,12 @@ public abstract class ServiceBrokerV2IntegrationTestBase {
 
     @Test
     public void case1_fetchCatalogFailsWithoutCredentials() throws Exception {
-        given().auth().none().when().get(fetchCatalogPath).then().statusCode(HttpStatus.SC_UNAUTHORIZED);
+        given().header(apiHeader).auth().none().when().get(fetchCatalogPath).then().statusCode(HttpStatus.SC_UNAUTHORIZED);
     }
 
     @Test
     public void case1_fetchCatalogSucceedsWithCredentials() throws Exception {
-        given().auth().basic(username, password).when().get(fetchCatalogPath).then().statusCode(HttpStatus.SC_OK);
+        given().header(apiHeader).auth().basic(username, password).when().get(fetchCatalogPath).then().statusCode(HttpStatus.SC_OK);
     }
 
     /**
@@ -118,7 +125,7 @@ public abstract class ServiceBrokerV2IntegrationTestBase {
     @Test
     public void case2_provisionInstanceFailsWithoutCredentials() throws Exception {
         String provisionInstancePath = String.format(provisionOrRemoveInstanceBasePath, instanceId);
-        given().auth().none().when().put(provisionInstancePath).then().statusCode(HttpStatus.SC_UNAUTHORIZED);
+        given().header(apiHeader).auth().none().when().put(provisionInstancePath).then().statusCode(HttpStatus.SC_UNAUTHORIZED);
     }
 
     @Test
@@ -131,7 +138,7 @@ public abstract class ServiceBrokerV2IntegrationTestBase {
                 "  \"space_guid\":        \"" + spaceGuid + "\"\n" +
                 "}";
 
-        given().auth().basic(username, password).request().contentType(ContentType.JSON).body(request_body).when().put(provisionInstancePath).then().statusCode(HttpStatus.SC_CREATED);
+        given().header(apiHeader).auth().basic(username, password).request().contentType(ContentType.JSON).body(request_body).when().put(provisionInstancePath).then().statusCode(HttpStatus.SC_CREATED);
     }
 
     /**
@@ -143,7 +150,7 @@ public abstract class ServiceBrokerV2IntegrationTestBase {
     @Test
     public void case3_createBindingFailsWithoutCredentials() throws Exception {
         String createBindingPath = String.format(createOrRemoveBindingBasePath, instanceId, serviceId);
-        given().auth().none().when().put(createBindingPath).then().statusCode(HttpStatus.SC_UNAUTHORIZED);
+        given().header(apiHeader).auth().none().when().put(createBindingPath).then().statusCode(HttpStatus.SC_UNAUTHORIZED);
     }
 
     @Test
@@ -155,7 +162,7 @@ public abstract class ServiceBrokerV2IntegrationTestBase {
                 "  \"app_guid\":     \"" + appGuid + "\"\n" +
                 "}";
 
-        given().auth().basic(username, password).request().contentType(ContentType.JSON).body(request_body).when().put(createBindingPath).then().statusCode(HttpStatus.SC_CREATED);
+        given().header(apiHeader).auth().basic(username, password).request().contentType(ContentType.JSON).body(request_body).when().put(createBindingPath).then().statusCode(HttpStatus.SC_CREATED);
     }
 
     /**
@@ -167,13 +174,13 @@ public abstract class ServiceBrokerV2IntegrationTestBase {
     @Test
     public void case4_removeBindingFailsWithoutCredentials() throws Exception {
         String removeBindingPath = String.format(createOrRemoveBindingBasePath, instanceId, serviceId) + "?service_id=" + serviceId + "&plan_id=" + planId;
-        given().auth().none().when().delete(removeBindingPath).then().statusCode(HttpStatus.SC_UNAUTHORIZED);
+        given().header(apiHeader).auth().none().when().delete(removeBindingPath).then().statusCode(HttpStatus.SC_UNAUTHORIZED);
     }
 
     @Test
     public void case4_removeBindingSucceedsWithCredentials() throws Exception {
         String removeBindingPath = String.format(createOrRemoveBindingBasePath, instanceId, serviceId) + "?service_id=" + serviceId + "&plan_id=" + planId;
-        given().auth().basic(username, password).when().delete(removeBindingPath).then().statusCode(HttpStatus.SC_OK);
+        given().header(apiHeader).auth().basic(username, password).when().delete(removeBindingPath).then().statusCode(HttpStatus.SC_OK);
     }
 
     /**
@@ -185,12 +192,12 @@ public abstract class ServiceBrokerV2IntegrationTestBase {
     @Test
     public void case5_removeInstanceFailsWithoutCredentials() throws Exception {
         String removeInstancePath = String.format(provisionOrRemoveInstanceBasePath, instanceId) + "?service_id=" + serviceId + "&plan_id=" + planId;
-        given().auth().none().when().delete(removeInstancePath).then().statusCode(HttpStatus.SC_UNAUTHORIZED);
+        given().header(apiHeader).auth().none().when().delete(removeInstancePath).then().statusCode(HttpStatus.SC_UNAUTHORIZED);
     }
 
     @Test
     public void case5_removeInstanceSucceedsWithCredentials() throws Exception {
         String removeInstancePath = String.format(provisionOrRemoveInstanceBasePath, instanceId) + "?service_id=" + serviceId + "&plan_id=" + planId;
-        given().auth().basic(username, password).when().delete(removeInstancePath).then().statusCode(HttpStatus.SC_OK);
+        given().header(apiHeader).auth().basic(username, password).when().delete(removeInstancePath).then().statusCode(HttpStatus.SC_OK);
     }
 }

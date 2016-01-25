@@ -16,27 +16,21 @@
 package org.cloudfoundry.community.servicebroker.s3.plan;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
-import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
+import org.cloudfoundry.community.servicebroker.model.*;
 
 import java.util.List;
 
 public interface Plan {
     // static org.cloudfoundry.community.servicebroker.model.Plan getPlan() should also be present, but is static.
 
-    ServiceInstance createServiceInstance(ServiceDefinition service, String serviceInstanceId, String planId,
-                                          String organizationGuid, String spaceGuid);
+    ServiceInstance createServiceInstance(CreateServiceInstanceRequest request);
 
-    ServiceInstance deleteServiceInstance(String id);
+    ServiceInstance deleteServiceInstance(DeleteServiceInstanceRequest request);
 
-    ServiceInstanceBinding createServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance,
-                                                               String serviceId, String planId, String appGuid);
+    ServiceInstanceBinding createServiceInstanceBinding(CreateServiceInstanceBindingRequest request);
 
-    ServiceInstanceBinding deleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance,
-                                                               String serviceId, String planId) throws ServiceBrokerException;
-
-    List<ServiceInstance> getAllServiceInstances();
+    ServiceInstanceBinding deleteServiceInstanceBinding(DeleteServiceInstanceBindingRequest request)
+            throws ServiceBrokerException;
 
     ServiceInstance getServiceInstance(String id);
 }
