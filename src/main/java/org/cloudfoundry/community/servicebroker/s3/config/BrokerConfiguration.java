@@ -21,6 +21,7 @@ import java.util.*;
 
 import com.amazonaws.ClientConfiguration;
 import org.cloudfoundry.community.servicebroker.config.BrokerApiVersionConfig;
+import org.cloudfoundry.community.servicebroker.model.BrokerApiVersion;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.Plan;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
@@ -75,6 +76,11 @@ public class BrokerConfiguration {
         URL url = new ClassPathResource("default-bucket-policy.json").getURL();
         String policyDocument = Resources.toString(url, Charsets.UTF_8);
         return new BucketGroupPolicy(policyDocument);
+    }
+
+    @Bean
+    public BrokerApiVersion brokerApiVersion() throws IOException {
+        return new BrokerApiVersion();
     }
 
     @Bean
