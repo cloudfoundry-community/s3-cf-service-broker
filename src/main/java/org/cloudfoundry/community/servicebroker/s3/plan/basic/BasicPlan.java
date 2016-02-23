@@ -18,8 +18,8 @@ package org.cloudfoundry.community.servicebroker.s3.plan.basic;
 import com.amazonaws.services.identitymanagement.model.AccessKey;
 import com.amazonaws.services.identitymanagement.model.User;
 import com.amazonaws.services.s3.model.Bucket;
-import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
-import org.cloudfoundry.community.servicebroker.model.*;
+import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
+import org.springframework.cloud.servicebroker.model.*;
 import org.cloudfoundry.community.servicebroker.s3.plan.Plan;
 import org.cloudfoundry.community.servicebroker.s3.service.S3;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +41,8 @@ public class BasicPlan implements Plan {
         this.s3 = s3;
     }
 
-    public static org.cloudfoundry.community.servicebroker.model.Plan getPlan(String planId, String planName) {
-        return new org.cloudfoundry.community.servicebroker.model.Plan(planId, planName, "An S3 plan providing a single bucket with unlimited storage.",
+    public static org.springframework.cloud.servicebroker.model.Plan getPlan(String planId, String planName) {
+        return new org.springframework.cloud.servicebroker.model.Plan(planId, planName, "An S3 plan providing a single bucket with unlimited storage.",
                 getPlanMetadata());
     }
 
@@ -94,10 +94,10 @@ public class BasicPlan implements Plan {
     public ServiceInstanceBinding deleteServiceInstanceBinding(DeleteServiceInstanceBindingRequest request)
             throws ServiceBrokerException {
         // TODO make operations idempotent so we can handle retries on error
-        iam.removeUserFromGroupForInstance(request.getBindingId(), request.getInstance().getServiceInstanceId());
+        iam.removeUserFromGroupForInstance(request.getBindingId(), request.getServiceInstanceId());
         iam.deleteUserAccessKeysForBinding(request.getBindingId());
         iam.deleteUserForBinding(request.getBindingId());
-        return new ServiceInstanceBinding(request.getBindingId(), request.getInstance().getServiceInstanceId(), null, null, null);
+        return new ServiceInstanceBinding(request.getBindingId(), request.getServiceInstanceId(), null, null, null);
     }
 
     public ServiceInstance getServiceInstance(String id) {

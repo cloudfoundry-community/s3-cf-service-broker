@@ -17,12 +17,12 @@ package org.cloudfoundry.community.servicebroker.s3.service;
 
 import java.util.List;
 
-import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.servicebroker.model.CreateServiceInstanceRequest;
+import org.springframework.cloud.servicebroker.model.ServiceInstance;
 import org.springframework.stereotype.Component;
 
 import com.amazonaws.services.s3.AmazonS3;
