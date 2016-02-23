@@ -15,16 +15,20 @@
  */
 package org.cloudfoundry.community.servicebroker.s3.service;
 
-import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
-import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceBindingExistsException;
-import org.cloudfoundry.community.servicebroker.model.*;
 import org.cloudfoundry.community.servicebroker.s3.plan.Plan;
-import org.cloudfoundry.community.servicebroker.service.ServiceInstanceBindingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
+import org.springframework.cloud.servicebroker.exception.ServiceInstanceBindingExistsException;
+import org.springframework.cloud.servicebroker.model.CreateServiceInstanceBindingRequest;
+import org.springframework.cloud.servicebroker.model.CreateServiceInstanceBindingResponse;
+import org.springframework.cloud.servicebroker.model.DeleteServiceInstanceBindingRequest;
+import org.springframework.cloud.servicebroker.model.ServiceInstanceBinding;
+import org.springframework.cloud.servicebroker.service.ServiceInstanceBindingService;
 import org.springframework.stereotype.Service;
 
 /**
  * @author David Ehringer
+ * @author Justin Carter
  */
 @Service
 public class S3ServiceInstanceBindingService implements ServiceInstanceBindingService {
@@ -36,14 +40,16 @@ public class S3ServiceInstanceBindingService implements ServiceInstanceBindingSe
     }
 
     @Override
-    public ServiceInstanceBinding createServiceInstanceBinding(CreateServiceInstanceBindingRequest request)
+    public CreateServiceInstanceBindingResponse createServiceInstanceBinding(CreateServiceInstanceBindingRequest request)
             throws ServiceInstanceBindingExistsException, ServiceBrokerException {
-        return plan.createServiceInstanceBinding(request);
+        ServiceInstanceBinding binding = plan.createServiceInstanceBinding(request);
+        return new CreateServiceInstanceBindingResponse(binding.getCredentials());
     }
 
     @Override
-    public ServiceInstanceBinding deleteServiceInstanceBinding(
+    public void deleteServiceInstanceBinding(
             DeleteServiceInstanceBindingRequest request) throws ServiceBrokerException {
-        return plan.deleteServiceInstanceBinding(request);
+         plan.deleteServiceInstanceBinding(request);
+        return;
     }
 }

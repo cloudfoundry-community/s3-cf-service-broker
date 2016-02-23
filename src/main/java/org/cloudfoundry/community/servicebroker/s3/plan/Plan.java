@@ -15,10 +15,8 @@
  */
 package org.cloudfoundry.community.servicebroker.s3.plan;
 
-import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
-import org.cloudfoundry.community.servicebroker.model.*;
-
-import java.util.List;
+import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
+import org.springframework.cloud.servicebroker.model.*;
 
 public interface Plan {
     // static org.cloudfoundry.community.servicebroker.model.Plan getPlan() should also be present, but is static.
