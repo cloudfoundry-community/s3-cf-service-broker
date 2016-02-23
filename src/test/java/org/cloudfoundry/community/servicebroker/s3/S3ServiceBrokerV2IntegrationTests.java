@@ -110,7 +110,7 @@ public class S3ServiceBrokerV2IntegrationTests extends ServiceBrokerV2Integratio
         String request_body = "{\n" +
                 "  \"plan_id\":      \"" + planId + "\",\n" +
                 "  \"service_id\":   \"" + serviceId + "\",\n" +
-                "  \"app_guid\":     \"" + appGuid + "\"\n" +
+                "  \"bind_resource\": { \"app_guid\": \"" + appGuid + "\" }\n" +
                 "}";
 
 

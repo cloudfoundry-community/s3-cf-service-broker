@@ -32,13 +32,6 @@
 			<version>${spring-cloud-cloudfoundry-service-broker.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-cloudfoundry-service-broker</artifactId>
-			<version>${spring-cloud-cloudfoundry-service-broker.version}</version>
-			<classifier>test</classifier>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk</artifactId>
 			<version>1.10.49</version>

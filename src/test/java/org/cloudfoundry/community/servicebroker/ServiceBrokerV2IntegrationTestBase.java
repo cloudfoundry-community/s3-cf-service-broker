@@ -56,7 +56,7 @@ public abstract class ServiceBrokerV2IntegrationTestBase {
 
     final static String API_VERSION_HEADER = "X-Broker-Api-Version";
 
-    final static String API_VERSION = "2.4";
+    final static String API_VERSION = "2.8";
 
     protected Header apiHeader = new Header(API_VERSION_HEADER, API_VERSION);
 
