@@ -27,6 +27,8 @@ import org.cloudfoundry.community.servicebroker.s3.service.S3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +37,7 @@ import java.util.Map;
 @Component
 public class BasicPlan implements Plan {
     public static final String PLAN_ID = "s3-basic-plan";
-
+    public static final String AMAZON_S3_HOST = "s3.amazonaws.com";
     private final BasicPlanIam iam;
     private final S3 s3;
 
@@ -84,13 +86,30 @@ public class BasicPlan implements Plan {
         AccessKey accessKey = iam.createAccessKey(user);
         // TODO create password and add to credentials
         iam.addUserToGroup(user, iam.getGroupNameForInstance(serviceInstance.getId()));
-
+        String bucketName = s3.getBucketNameForInstance(serviceInstance.getId());
         Map<String, Object> credentials = new HashMap<String, Object>();
-        credentials.put("bucket", s3.getBucketNameForInstance(serviceInstance.getId()));
+        credentials.put("bucket", bucketName);
         credentials.put("username", user.getUserName());
         credentials.put("access_key_id", accessKey.getAccessKeyId());
         credentials.put("secret_access_key", accessKey.getSecretAccessKey());
+        credentials.put("host", AMAZON_S3_HOST);
+        credentials.put("uri", this.generateUri(accessKey.getAccessKeyId(), accessKey.getSecretAccessKey(), bucketName));
         return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, null, appGuid);
+    }
+
+    private String generateUri(String accessKeyId, String secretAccessKey, String bucketName){
+        try {
+            accessKeyId = URLEncoder.encode(accessKeyId, "UTF-8");
+            secretAccessKey = URLEncoder.encode(secretAccessKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            //let accessKeyId and secretAccessKey like they are
+        }
+        return String.format("s3://%s:%s@%s/%s",
+                accessKeyId,
+                secretAccessKey,
+                AMAZON_S3_HOST,
+                bucketName
+        );
     }
 
     public ServiceInstanceBinding deleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance,
