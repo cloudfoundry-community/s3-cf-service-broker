@@ -60,7 +60,9 @@ The credentials provided in a bind call have the following format:
 	"username":"cloud-foundry-s3-c5271ba4-6d2f-4163-843c-6a5fdceb7a1a",
 	"access_key_id":"secret",
 	"bucket":"cloud-foundry-2eac2d52-bfc9-4d0f-af28-c02187689d72",
-	"secret_access_key":"secret"
+	"secret_access_key":"secret",
+	"host":"s3.amazonaws.com",
+	"uri":"s3://secret:secret@s3.amazonaws.com/cloud-foundry-2eac2d52-bfc9-4d0f-af28-c02187689d72"
 }
 ```
 
