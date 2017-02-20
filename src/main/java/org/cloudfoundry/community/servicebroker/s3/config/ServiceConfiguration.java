@@ -16,16 +16,16 @@ import java.util.*;
 @Configuration
 public class ServiceConfiguration {
 
-    @Value("${SERVICE_ID:s3}")
+    @Value("${SERVICE.ID:s3}")
     private String serviceId;
 
-    @Value("${SERVICE_NAME:amazon-s3}")
+    @Value("${SERVICE.NAME:amazon-s3}")
     private String serviceName;
 
-    @Value("${PLAN_ID:s3-basic-plan}")
+    @Value("${PLAN.ID:s3-basic-plan}")
     private String basicPlanId;
 
-    @Value("${PLAN_NAME:basic}")
+    @Value("${PLAN.NAME:basic}")
     private String basicPlanName;
 
     @Bean
