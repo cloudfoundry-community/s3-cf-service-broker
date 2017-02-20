@@ -1,4 +1,6 @@
 ---
 applications:
   - name: s3-cf-service-broker
+    memory: 512M
     buildpack: java_buildpack
+    path: target/s3-cf-service-broker-2.0.0-SNAPSHOT.jar
